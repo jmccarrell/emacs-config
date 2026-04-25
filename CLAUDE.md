@@ -101,6 +101,30 @@ Confirmed byte-identical to interactive `M-x org-babel-tangle`. Cold-run wall ti
 
 In TASK.md "Tangle steps" sections, Claude should suggest `just tangle` (shell-side, no Emacs context-switch) as the primary path, and `M-x org-babel-tangle` as the alternate. Claude itself cannot run these in the sandbox today (no `emacs` binary), but the recipes are the same on both sides.
 
+### Info-node grounding for investigations
+
+`literate-emacs.d/main/info-dir.txt` is a snapshot of all Info manuals visible to Jeff's Emacs (generated via `(info "(dir)")` after `package-initialize`). It's the canonical reference for what package documentation is locally available.
+
+**Standard workflow:** any investigation that might reference Emacs / package docs begins with Claude reading `info-dir.txt` (via the Read tool). This grounds analysis in Jeff's specific install state — which packages have manuals, what version, what aliases — rather than generic 2026 emacs knowledge.
+
+Refresh after package install/remove:
+
+```sh
+cd literate-emacs.d/<worktree>
+just info-dir-update
+git add info-dir.txt && git commit -m "info-dir: refresh after package changes"
+```
+
+For specific Info nodes (e.g. when reading a section of magit's manual):
+
+```sh
+just info-node "(magit) Worktree"
+```
+
+Writes to `/tmp/info-node.txt`, overwritten each call. Per-investigation; not committed. Jeff attaches the file to the session; Claude reads it via Read. The recipe accepts any node reference of the form `"(MANUAL) NODE"` — including `"(MANUAL) Top"` for a manual's table of contents when `info-dir.txt`'s one-line description isn't enough to guess the right section name.
+
+When proposing info-node fetches, Claude states up front *which nodes* and *why each one* — discovery should be explicit, not blind.
+
 ### Verification step style
 
 When writing verification steps inside a `TASK.md`, Claude follows three rules:
