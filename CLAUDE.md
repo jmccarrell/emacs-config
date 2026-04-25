@@ -79,6 +79,28 @@ Before editing files in a new worktree, Claude states in the chat message that k
 2. `~/.emacs.d/init.el` is repointed at the worktree's `init.el`.
 3. If the sub-goal adds new packages, `M-x package-refresh-contents` is expected before tangle.
 
+### Tangling and verifying via justfile
+
+Each worktree (and `main/`) contains a `justfile` with shell-side recipes for tangling and basic load-checking. Use these instead of `M-x org-babel-tangle` when scripting or when a quick syntax check is more useful than starting Emacs.
+
+```sh
+cd literate-emacs.d/<worktree>
+just --list      # show recipes
+just tangle      # regenerate init.el from jeff-emacs-config.org
+just verify      # tangle, then load init.el in batch -Q to catch errors
+```
+
+`just tangle` runs:
+
+```sh
+emacs --batch -l org \
+      --eval '(org-babel-tangle-file "jeff-emacs-config.org")'
+```
+
+Confirmed byte-identical to interactive `M-x org-babel-tangle`. Cold-run wall time is ~480ms on Apple Silicon.
+
+In TASK.md "Tangle steps" sections, Claude should suggest `just tangle` (shell-side, no Emacs context-switch) as the primary path, and `M-x org-babel-tangle` as the alternate. Claude itself cannot run these in the sandbox today (no `emacs` binary), but the recipes are the same on both sides.
+
 ### Verification step style
 
 When writing verification steps inside a `TASK.md`, Claude follows two rules:
