@@ -32,7 +32,32 @@ Future feature branches will appear as sibling directories to `main/` (e.g., `li
 
 ## reference-emacs-configs — read-only references
 
-These are cloned copies of well-known Emacs configurations used for research and inspiration. They are **not actively developed** — treat them as read-only reference material. Do not commit to or modify these repos.
+`reference-emacs-configs/` is a local cache of other developers' Emacs configs used as ground truth during investigations. The directory is gitignored at workspace level — repos in it are *not* committed; each has its own upstream origin.
+
+**Tracked repos** are listed in `reference-repos.list` at the workspace root (one line per repo: `name url`). The synthesis file `reference-configs.md` describes what each tracked repo is for and what we've already extracted from each.
+
+To work on a fresh machine after cloning the workspace:
+
+```sh
+cd /Users/jeff/jwm/proj/emacs-config
+just ref-sync       # clones every registered repo into reference-emacs-configs/
+```
+
+To add a new repo when an investigation discovers one worth tracking:
+
+```sh
+just ref-add NAME https://github.com/owner/repo
+just ref-sync       # clones the new one
+# then add a section to reference-configs.md describing what it's for
+```
+
+To see the current registry:
+
+```sh
+just ref-list
+```
+
+**Workflow rule:** before starting an investigation, read `reference-configs.md` to identify which tracked repos are relevant. If a needed repo isn't tracked yet, add it via `just ref-add`. Treat these repos as read-only — don't commit to them or modify them; they're regenerable cache.
 
 ## TASK.md convention
 
