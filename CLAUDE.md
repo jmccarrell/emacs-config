@@ -1,6 +1,6 @@
 # emacs-config workspace
 
-This folder is a workspace containing Jeff's Emacs configuration project and a collection of reference configurations. It is **not itself a git repository**.
+This folder is a workspace containing Jeff's Emacs configuration project and a collection of reference configurations. The workspace folder is itself a git repository (default branch `main`); `literate-emacs.d/` and `reference-emacs-configs/` are gitignored at this level — each contains its own independent git repo. The workspace repo tracks workspace-level files like this `CLAUDE.md`.
 
 ## Structure
 
@@ -85,3 +85,27 @@ When writing verification steps inside a `TASK.md`, Claude follows two rules:
 
 - **Prefer keystrokes over typed commands.** Use `C-h v <var>` rather than `M-x describe-variable RET <var> RET`, `C-h f <fn>` rather than `M-x describe-function`, `C-h k <keys>` rather than `M-x describe-key`. Reading a keystroke in a checklist builds muscle memory; typing a command name at `M-x` does not.
 - **Isolate preconditions.** Each pass-criterion should either be provable by a single command whose failure mode is unambiguous, or should explicitly list what else needs to be true for the test to pass. When a test's pass depends on the symlink or tangle state, add a step-0 check (`readlink ~/.emacs.d/init.el`, or `grep <change> <worktree>/init.el`) that isolates that precondition before the live-emacs test.
+
+### Meta-doc edits (in `main/` or in the workspace)
+
+The worktree rule has a narrow exception: documentation-only files that do not get tangled into `init.el` may be edited directly. The rationale is that meta-doc edits don't risk breaking the live Emacs config, so a feature worktree adds friction without benefit. Examples:
+
+- `literate-emacs.d/main/emacs-2026-landscape.org` — backlog tracker (repo-level)
+- `literate-emacs.d/main/emacs-cheat-sheet.org` — when adding rows to existing sections that don't depend on a new `use-package` block (cheat-sheet edits *coupled* to a new sub-goal still go through a worktree alongside the config change)
+- `/Users/jeff/jwm/proj/emacs-config/CLAUDE.md` — workspace-level meta-doc (this file)
+
+**Rule: every direct edit Claude makes to a tracked file must be accompanied in the same response by an explicit commit command** that Jeff can paste. Without the commit, the edit accumulates as silent uncommitted state, and merge conflicts later when sub-goal worktrees touch the same file.
+
+For repo-level files (in `literate-emacs.d/main/`):
+
+```sh
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main && \
+  git add <file> && git commit -m "<short summary>"
+```
+
+For workspace-level files (this `CLAUDE.md`, etc.):
+
+```sh
+cd /Users/jeff/jwm/proj/emacs-config && \
+  git add <file> && git commit -m "<short summary>"
+```
