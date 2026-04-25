@@ -121,7 +121,7 @@ For specific Info nodes (e.g. when reading a section of magit's manual):
 just info-node "(magit) Worktree"
 ```
 
-Writes to `/tmp/info-node.txt`, overwritten each call. Per-investigation; not committed. Jeff attaches the file to the session; Claude reads it via Read. The recipe accepts any node reference of the form `"(MANUAL) NODE"` — including `"(MANUAL) Top"` for a manual's table of contents when `info-dir.txt`'s one-line description isn't enough to guess the right section name.
+Writes `info-node.txt` in the cwd of whichever worktree's justfile was invoked (typically `literate-emacs.d/main/info-node.txt`). Overwritten each call. Per-investigation; not committed. Jeff attaches the file to the session; Claude reads it via Read. The recipe accepts any node reference of the form `"(MANUAL) NODE"` — including `"(MANUAL) Top"` for a manual's table of contents when `info-dir.txt`'s one-line description isn't enough to guess the right section name.
 
 When proposing info-node fetches, Claude states up front *which nodes* and *why each one* — discovery should be explicit, not blind.
 
