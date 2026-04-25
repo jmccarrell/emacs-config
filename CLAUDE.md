@@ -34,20 +34,37 @@ Future feature branches will appear as sibling directories to `main/` (e.g., `li
 
 `reference-emacs-configs/` is a local cache of other developers' Emacs configs used as ground truth during investigations. The directory is gitignored at workspace level — repos in it are *not* committed; each has its own upstream origin.
 
-**Tracked repos** are listed in `reference-repos.list` at the workspace root (one line per repo: `name url`). The synthesis file `reference-configs.md` describes what each tracked repo is for and what we've already extracted from each.
+**Tracked repos** are listed in `reference-repos.list` at the workspace root. Each line is three whitespace-delimited fields: `name url last-known-sha`. The `last-known-sha` is the upstream commit at which we last analyzed the repo; comparing it to current upstream tells us what's new since then. URLs of `-` mean a local-only repo with no upstream (rare; one current case is `greendog-gtd`).
+
+The synthesis file `reference-configs.md` describes what each tracked repo is for and what we've already extracted from each. The inventory tracks all repos on disk; the synthesis covers only the subset we actively analyze.
+
+### Workflow
 
 To work on a fresh machine after cloning the workspace:
 
 ```sh
 cd /Users/jeff/jwm/proj/emacs-config
-just ref-sync       # clones every registered repo into reference-emacs-configs/
+just ref-show-plan         # prints `git clone …` commands needed
+# execute the printed commands (or pipe to bash)
+just ref-update-inventory  # capture the just-cloned commit SHAs into the inventory
 ```
 
-To add a new repo when an investigation discovers one worth tracking:
+To check for upstream changes since the last analysis:
+
+```sh
+just ref-show-changes      # prints what's new per repo since last-known-sha
+# consume notable changes into reference-configs.md
+# if a repo was pulled to advance local: 
+just ref-update-inventory  # records new SHAs
+```
+
+To add a new repo discovered during an investigation:
 
 ```sh
 just ref-add NAME https://github.com/owner/repo
-just ref-sync       # clones the new one
+just ref-show-plan         # prints clone command
+# execute it
+just ref-update-inventory  # records the SHA
 # then add a section to reference-configs.md describing what it's for
 ```
 
@@ -56,6 +73,14 @@ To see the current registry:
 ```sh
 just ref-list
 ```
+
+### Recipe summary
+
+- **`ref-list`**: cat the inventory.
+- **`ref-add NAME URL`**: append a new entry with `-` placeholder for SHA.
+- **`ref-show-plan`**: print git commands needed to align filesystem with inventory + upstream HEAD. Doesn't execute.
+- **`ref-show-changes`**: per-repo, fetch upstream and list new commits since last-known-sha. Use this to feed analysis updates into `reference-configs.md`.
+- **`ref-update-inventory`**: capture each repo's current local HEAD into its inventory `last-known-sha`. Run after consuming changes.
 
 **Workflow rule:** before starting an investigation, read `reference-configs.md` to identify which tracked repos are relevant. If a needed repo isn't tracked yet, add it via `just ref-add`. Treat these repos as read-only — don't commit to them or modify them; they're regenerable cache.
 

@@ -4,16 +4,32 @@ This file is the canonical record of which other developers' Emacs configs we
 treat as ground-truth references during investigations, and what we've
 already extracted from each. It is committed to the workspace repo and
 travels with the project. The actual cloned repos in
-`reference-emacs-configs/` are a per-machine cache, rebuildable via
-`just ref-sync`.
+`reference-emacs-configs/` are a per-machine cache, rebuildable from the
+inventory in `reference-repos.list` via `just ref-show-plan`.
 
-**Last refreshed:** 2026-04-25 (all 5 repos resynced to upstream HEAD).
+**Last refreshed:** 2026-04-25 (all 5 actively-analyzed repos resynced to
+upstream HEAD).
+
+## Inventory vs. synthesis
+
+The inventory in `reference-repos.list` tracks **all 14 repos** currently on
+disk, with last-known-SHAs for change detection. This synthesis file covers
+the **5 we actively analyze** (HIGH/MEDIUM tier) — they're the ones whose
+patterns we extract into our own config.
+
+The other 9 repos (abo-abo-dotemacs, andreyorst-dotfiles, danielmai-dotemacs,
+ebzzry-dotfiles, editorconfig-emacs, greendog-gtd, howardabrams-dot-files,
+sirpscl-emacs.d, smartparens) are tracked in inventory for state preservation
+but are not subjects of ongoing investigation. Any of them can be promoted
+to active analysis by adding a section here; the inventory tooling already
+snapshots their state.
 
 ## Tracked repos at a glance
 
 The `name` column is also the local directory under
 `reference-emacs-configs/` and the registry key in
-`reference-repos.list`.
+`reference-repos.list`. The five rows below are the actively-analyzed
+subset of the 14-entry inventory.
 
 | name                   | URL                                          | tier   | use for                                  |
 |------------------------|----------------------------------------------|--------|------------------------------------------|
@@ -234,10 +250,12 @@ edge-tts-speak-region`.
 
 1. Read this file to identify candidate repos.
 2. Confirm those repos are present locally (`reference-emacs-configs/<name>/`).
-   If missing, `just ref-sync` clones them.
-3. If a repo is "stale" (last useful pull > 6 months and we're starting
-   a substantial sub-goal in its area), refresh: `just ref-sync` does
-   `git pull --ff-only` on existing repos.
+   `just ref-show-plan` prints clone commands for missing entries.
+3. If a repo is potentially stale (last analyzed > N months and we're
+   starting a substantial sub-goal in its area), refresh: `just
+   ref-show-changes` reports new commits per repo since the
+   inventory's last-known SHA. Pull manually if you want to advance
+   local state, then `just ref-update-inventory` to record the new SHA.
 4. Grep / read with `git -C reference-emacs-configs/<name> ...`.
 
 ### Discovering a new repo worth tracking
@@ -245,30 +263,41 @@ edge-tts-speak-region`.
 ```sh
 cd /Users/jeff/jwm/proj/emacs-config
 just ref-add <name> <url>
-just ref-sync
+just ref-show-plan          # prints `git clone …`
+# execute the clone
+just ref-update-inventory   # records the SHA
 # update this file with notes about the new repo
-git add justfile reference-configs.md
+git add justfile reference-configs.md reference-repos.list
 git commit -m "ref: track <name>"
 ```
 
-### Re-clone heuristic
+### Re-analysis heuristic
 
-A repo becomes worth pulling fresh if:
+A tracked repo becomes worth re-analyzing if:
 
 - We're starting an investigation in its specific area of focus
   (e.g. jwiegley before AI/LLM work).
-- It's been ≥6 months since the last meaningful pull.
+- `just ref-show-changes` reports a non-trivial number of new commits
+  since the last analyzed SHA.
 - A specific question requires "what does this developer do *now*?"
   (current state) rather than "what did we extract previously?"
   (point-in-time snapshot).
 
-### Pruning
+### About the 9 inventory-only repos
 
-The 9 repos we previously cloned but no longer track (abo-abo,
-andreyorst, danielmai, ebzzry, greendog, howardabrams, sirpscl,
-editorconfig-emacs, smartparens) are not in the registry. They remain
-on disk until manually `rm -rf`'d; `just ref-sync` ignores them. If a
-specific need arises, `just ref-add` re-tracks any of them.
+The 9 repos we have on disk but don't actively analyze
+(abo-abo-dotemacs, andreyorst-dotfiles, danielmai-dotemacs,
+ebzzry-dotfiles, editorconfig-emacs, greendog-gtd,
+howardabrams-dot-files, sirpscl-emacs.d, smartparens) are tracked in
+`reference-repos.list` for state preservation. `just ref-show-changes`
+reports their upstream activity along with the others; if anything
+notable happens, we can promote one to active analysis by writing a
+section here. Until then, no synthesis update needed.
+
+`greendog-gtd` is a special case: no upstream URL (`-` in the
+inventory). It's a local-only directory tracked for SHA snapshots
+only. Recipes treat it gracefully (skip clone/fetch, note the
+local-only state).
 
 ## Updating this file
 
