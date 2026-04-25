@@ -87,7 +87,7 @@ Each worktree (and `main/`) contains a `justfile` with shell-side recipes for ta
 cd literate-emacs.d/<worktree>
 just --list      # show recipes
 just tangle      # regenerate init.el from jeff-emacs-config.org
-just verify      # tangle, then load init.el in batch -Q to catch errors
+just verify-tangle      # tangle, then load init.el in batch -Q to catch errors
 ```
 
 `just tangle` runs:
@@ -103,8 +103,9 @@ In TASK.md "Tangle steps" sections, Claude should suggest `just tangle` (shell-s
 
 ### Verification step style
 
-When writing verification steps inside a `TASK.md`, Claude follows two rules:
+When writing verification steps inside a `TASK.md`, Claude follows three rules:
 
+- **Match verification depth to behavior change.** For sub-goals that produce *no* expected user-visible change in live Emacs (pure deletions of unused declarations, refactors that should be byte-identical, doc-only edits), `just verify-tangle` is sufficient on its own. It tangles + loads `init.el` in batch `-Q`; a clean exit proves both tangle correctness and load success in one shot. Skip the longer flows (step-0 grep checks, live-Emacs keystroke walks) — they have nothing meaningful to confirm. For sub-goals that *do* change behavior (new packages, new bindings, new modes, anything Jeff would notice), keep the fuller verification flow with the bullets below.
 - **Prefer keystrokes over typed commands.** Use `C-h v <var>` rather than `M-x describe-variable RET <var> RET`, `C-h f <fn>` rather than `M-x describe-function`, `C-h k <keys>` rather than `M-x describe-key`. Reading a keystroke in a checklist builds muscle memory; typing a command name at `M-x` does not.
 - **Isolate preconditions.** Each pass-criterion should either be provable by a single command whose failure mode is unambiguous, or should explicitly list what else needs to be true for the test to pass. When a test's pass depends on the symlink or tangle state, add a step-0 check (`readlink ~/.emacs.d/init.el`, or `grep <change> <worktree>/init.el`) that isolates that precondition before the live-emacs test.
 
