@@ -7,35 +7,34 @@ travels with the project. The actual cloned repos in
 `reference-emacs-configs/` are a per-machine cache, rebuildable from the
 inventory in `reference-repos.list` via `just ref-show-plan`.
 
-**Last refreshed:** 2026-04-25 (all 5 actively-analyzed repos resynced to
-upstream HEAD).
+**Last refreshed:** 2026-04-25 (all actively-analyzed repos resynced to
+upstream HEAD; abo-abo-dotemacs promoted after a 227-commit delta).
 
 ## Inventory vs. synthesis
 
-The inventory in `reference-repos.list` tracks **all 14 repos** currently on
-disk, with last-known-SHAs for change detection. This synthesis file covers
-the **5 we actively analyze** (HIGH/MEDIUM tier) — they're the ones whose
-patterns we extract into our own config.
+The inventory in `reference-repos.list` tracks all registered repos, with
+last-known-SHAs for change detection. This synthesis file covers the repos
+we actively analyze (HIGH/MEDIUM tier) — they're the ones whose patterns we
+extract into our own config.
 
-The other 9 repos (abo-abo-dotemacs, andreyorst-dotfiles, danielmai-dotemacs,
-ebzzry-dotfiles, editorconfig-emacs, greendog-gtd, howardabrams-dot-files,
-sirpscl-emacs.d, smartparens) are tracked in inventory for state preservation
-but are not subjects of ongoing investigation. Any of them can be promoted
-to active analysis by adding a section here; the inventory tooling already
-snapshots their state.
+The other inventory-only repos are tracked for state preservation but are not
+subjects of ongoing investigation. Any of them can be promoted to active
+analysis by adding a section here; the inventory tooling already snapshots
+their state.
 
 ## Tracked repos at a glance
 
 The `name` column is also the local directory under
 `reference-emacs-configs/` and the registry key in
-`reference-repos.list`. The five rows below are the actively-analyzed
-subset of the 14-entry inventory.
+`reference-repos.list`. The rows below are the actively-analyzed subset of
+the inventory.
 
 | name                   | URL                                          | tier   | use for                                  |
 |------------------------|----------------------------------------------|--------|------------------------------------------|
 | steve-purcell-dotemacs | https://github.com/purcell/emacs.d           | HIGH   | per-language patterns; clean migration templates |
 | jwiegley-dotemacs      | https://github.com/jwiegley/dot-emacs        | HIGH   | AI / LLM integration; gptel; local models |
 | bbatsov-dotemacs       | https://github.com/bbatsov/emacs.d           | MEDIUM | pragmatic 2026 modernizations; theme + UI nits |
+| abo-abo-dotemacs       | https://github.com/abo-abo/oremacs.git       | MEDIUM | Ivy-author counter-signal; Dired/vterm/Magit/Python micro-patterns |
 | sacha-chua-dotemacs    | https://github.com/sachac/.emacs.d           | MEDIUM | organic evolution; org / blogging workflows |
 | munen-emacs.d          | https://github.com/munen/emacs.d             | MEDIUM | gptel custom tools; MCP integration |
 
@@ -175,6 +174,75 @@ enhancements" sub-goal:
 - `Highlight current error in compilation/grep buffers`.
 - Theme: tokyo-night (latest update 2026-04-06).
 
+### abo-abo-dotemacs
+
+Oleh Krehel's `oremacs`. Highly active, highly personal, and useful as a
+counter-signal: as the Ivy author, he naturally still carries a lot of
+Ivy/Counsel/Hydra/Flycheck-era muscle memory. Do not use this as a clean
+2026 migration template. Use it to understand what a power user keeps,
+removes, and hand-tunes after years of daily use.
+
+Latest commit at last sync: `b17e90e 2025-12-17 packages.el: Remove
+docker-tramp`.
+
+**What we've extracted so far:**
+
+- Phase 0 landscape: active-evolution signal, but not one of the clean
+  migration templates.
+- 2026-04-25 refresh: 227 commits since `0c5f328` were reviewed for
+  backlog relevance. The useful signal is mostly in topic modules rather
+  than wholesale package choices.
+
+**Likely future relevance:**
+
+- Dired / Dirvish investigation: `modes/ora-dired.el` is a strong
+  "power-user Dired, not Dirvish" counterexample. Mine it for small Dired
+  affordances first (archive binding, omit rules, `dired-dwim-target`,
+  remote/TRAMP adjustments, file-size helpers) before deciding that a
+  full Dirvish front-end is worth the surface area.
+- Eat / terminal investigation: he added `vterm` rather than `eat`.
+  Together with Munen's vterm adoption and Purcell's eat adoption, this
+  gives us the right comparison frame: pure-Elisp portability versus
+  native-module terminal fidelity.
+- Verb / HTTP investigation: he added `restclient` support, not `verb`.
+  That is evidence that the restclient family is still viable for power
+  users; `verb` needs to win on concrete org workflow benefits, not just
+  novelty.
+- Magit worktree / ecosystem investigation: his Magit module binds
+  `magit-diff-visit-worktree-file`, adds `magit-ediff`, and prunes status
+  sections/headers for a denser status buffer. Read this when evaluating
+  Magit's worktree affordances and small Magit UX improvements.
+- Python follow-ups: `modes/ora-flycheck-ruff.el` and
+  `modes/ora-python.el` confirm Ruff's importance, but he keeps a very
+  custom Flycheck/Jedi setup and explicitly disables some Eglot/Flymake
+  behavior to fix completion delay. Treat this as troubleshooting signal
+  for Eglot completion latency, not as a reason to unwind our
+  Flymake-first Python migration.
+
+**Notable recent activity (as of 2026-04-25 sync):**
+
+- `modes/ora-python.el: Fix eglot completion delay` — disables Eglot's
+  completion-provider resolution path and removes Eglot's Flymake backend
+  from managed buffers. Useful if our Python buffers ever feel sluggish
+  under Eglot; not something to preemptively copy.
+- `modes/ora-flycheck-ruff.el: Add` — converges on Ruff diagnostics, but
+  via Flycheck. Our `flymake-ruff` choice remains better aligned with
+  built-in Eglot/Flymake.
+- `modes/ora-vterm.el: Add` and later updates — vterm is the active
+  terminal choice in this reference.
+- `modes/ora-http.el: Add` — a small `restclient-mode` workflow, relevant
+  to the `verb` comparison.
+- `modes/ora-javascript.el: Don't start lsp` — corroborates our current
+  "no JS LSP unless pain appears" stance. It does not argue against the
+  small cleanup pass from `js2-mode` toward `js-ts-mode`.
+- `modes/ora-nextmagit.el: Fix magit-diff-visit-worktree-file`, followed
+  later by `modes/ora-nextmagit.el: Remove` and a self-contained
+  `modes/ora-magit.el` — useful Magit patterns were consolidated, not
+  abandoned.
+- `packages.el: Remove docker-tramp` and `Clean up unused packages` —
+  reinforces the ongoing cleanup theme: remove latent package surface
+  when actual call sites disappear.
+
 ### sacha-chua-dotemacs
 
 Sacha Chua's `.emacs.d`. Organic, blog/journaling-heavy, less of a clean
@@ -283,21 +351,13 @@ A tracked repo becomes worth re-analyzing if:
   (current state) rather than "what did we extract previously?"
   (point-in-time snapshot).
 
-### About the 9 inventory-only repos
+### About the inventory-only repos
 
-The 9 repos we have on disk but don't actively analyze
-(abo-abo-dotemacs, andreyorst-dotfiles, danielmai-dotemacs,
-ebzzry-dotfiles, editorconfig-emacs, greendog-gtd,
-howardabrams-dot-files, sirpscl-emacs.d, smartparens) are tracked in
-`reference-repos.list` for state preservation. `just ref-show-changes`
-reports their upstream activity along with the others; if anything
-notable happens, we can promote one to active analysis by writing a
-section here. Until then, no synthesis update needed.
-
-`greendog-gtd` is a special case: no upstream URL (`-` in the
-inventory). It's a local-only directory tracked for SHA snapshots
-only. Recipes treat it gracefully (skip clone/fetch, note the
-local-only state).
+Repos that appear in `reference-repos.list` but not in the table above are
+tracked for state preservation. `just ref-show-changes` reports their
+upstream activity along with the others; if anything notable happens, we can
+promote one to active analysis by writing a section here. Until then, no
+synthesis update needed.
 
 ## Updating this file
 
