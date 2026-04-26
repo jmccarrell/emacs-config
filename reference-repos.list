@@ -2,7 +2,6 @@ abo-abo-dotemacs https://github.com/abo-abo/oremacs.git b17e90e0729e4fefc45f00b9
 andreyorst-dotfiles git@gitlab.com:andreyorst/dotfiles.git -
 bbatsov-dotemacs https://github.com/bbatsov/emacs.d.git d6cbae165e2eb100afc4897da58d75c984709333
 danielmai-dotemacs https://github.com/danielmai/.emacs.d.git e2ddab43e1ada5dbef6e47b4f37b1d96b9a0733a
-ebzzry-dotfiles https://github.com/ebzzry/dotfiles.git 653bb962f4be54226c3c0bbdd843766b98486f08
 jwiegley-dotemacs https://github.com/jwiegley/dot-emacs.git 1d50d3e3f2b2c8cfd993849984a88587fa9b875d
 munen-emacs.d https://github.com/munen/emacs.d.git 010121d75d4196db5b2be1bf5effd6333ed2dd92
 sacha-chua-dotemacs https://github.com/sachac/.emacs.d.git 44d695803c1ad85597f62d44da32091a53b6ccfe
