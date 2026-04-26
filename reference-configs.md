@@ -8,8 +8,9 @@ workspace repo and travels with the project. The actual cloned repos in
 `reference-emacs-configs/` are a per-machine cache, rebuildable from the
 inventory in `reference-repos.list` via `just ref-show-plan`.
 
-**Last refreshed:** 2026-04-25 (all actively-analyzed repos resynced to
-upstream HEAD; abo-abo-dotemacs promoted after a 227-commit delta).
+**Last refreshed:** 2026-04-26 (AI/LLM reference expansion: five
+additional lived-in configs registered; Sacha promoted as a practical
+AI-workflow signal).
 
 ## Inventory vs. synthesis
 
@@ -44,14 +45,20 @@ The `name` column is also the local directory under
 `reference-repos.list`. The rows below are the actively-analyzed subset of
 the inventory.
 
-| name                   | URL                                          | tier   | use for                                  |
-|------------------------|----------------------------------------------|--------|------------------------------------------|
-| steve-purcell-dotemacs | https://github.com/purcell/emacs.d           | HIGH   | per-language patterns; clean migration templates |
-| jwiegley-dotemacs      | https://github.com/jwiegley/dot-emacs        | HIGH   | AI / LLM integration; gptel; local models |
-| bbatsov-dotemacs       | https://github.com/bbatsov/emacs.d           | MEDIUM | pragmatic 2026 modernizations; theme + UI nits |
-| abo-abo-dotemacs       | https://github.com/abo-abo/oremacs.git       | MEDIUM | Ivy-author counter-signal; Dired/vterm/Magit/Python micro-patterns |
-| sacha-chua-dotemacs    | https://github.com/sachac/.emacs.d           | MEDIUM | organic evolution; org / blogging workflows |
-| munen-emacs.d          | https://github.com/munen/emacs.d             | MEDIUM | gptel custom tools; MCP integration |
+| name                           | URL                                                   | tier   | use for                                  |
+|--------------------------------|-------------------------------------------------------|--------|------------------------------------------|
+| steve-purcell-dotemacs         | https://github.com/purcell/emacs.d                    | HIGH   | per-language patterns; clean migration templates |
+| jwiegley-dotemacs              | https://github.com/jwiegley/dot-emacs                 | HIGH   | AI / LLM integration; gptel; local models |
+| yqrashawn-yqdotfiles           | https://github.com/yqrashawn/yqdotfiles               | HIGH   | advanced gptel tools, MCP, agent/proxy backends |
+| bbatsov-dotemacs               | https://github.com/bbatsov/emacs.d                    | MEDIUM | pragmatic 2026 modernizations; theme + UI nits |
+| abo-abo-dotemacs               | https://github.com/abo-abo/oremacs.git                | MEDIUM | Ivy-author counter-signal; Dired/vterm/Magit/Python micro-patterns |
+| sacha-chua-dotemacs            | https://github.com/sachac/.emacs.d                    | MEDIUM | practical gptel / agent-shell use in Org workflows |
+| munen-emacs.d                  | https://github.com/munen/emacs.d                      | MEDIUM | gptel custom tools; MCP integration |
+| redguardtoo-emacs.d            | https://github.com/redguardtoo/emacs.d                | MEDIUM | compact local Ollama gptel + Aider setup |
+| abougouffa-minemacs            | https://github.com/abougouffa/minemacs                | MEDIUM | local/cloud LLM stack; Ellama, gptel, Aidermacs, MCP |
+| matthewzmd-emacs.d             | https://github.com/MatthewZMD/.emacs.d                | MEDIUM | Aidermacs author config; OpenRouter model defaults |
+| manateelazycat-lazycat-emacs   | https://github.com/manateelazycat/lazycat-emacs       | MEDIUM | OpenRouter gptel, Aidermacs, Emigo, Whisper |
+| jkitchin-scimax                | https://github.com/jkitchin/scimax                    | MEDIUM | scientific Org, org-db, and RAG context |
 
 Tier definitions:
 
@@ -69,16 +76,43 @@ Jeff's roadmap:
 - Purcell remains the cleanest migration reference for language tooling and
   built-in-era Emacs defaults. Re-read him before Terraform, eat, undo, or
   any broad language-mode work.
-- jwiegley and munen are the two AI references. jwiegley shows the ambitious
-  ceiling (gptel presets, local-model orchestration, MCP-adjacent tooling);
-  munen shows a smaller custom-tools shape.
+- AI references now have a useful spread: jwiegley remains the ambitious
+  ceiling; munen and yqrashawn cover custom tools / MCP; redguardtoo covers
+  compact local Ollama; Sacha covers practical Org/language-learning use;
+  MinEmacs, MatthewZMD, and Lazycat show package-stack and agent choices.
+- John Kitchin's scimax is worth tracking for scientific Org workflows,
+  org-db, and RAG-adjacent context, but not as current daily-driver AI config:
+  its public `scimax-gptel` work is not yet present, and the README says
+  scimax development was discontinued on 2026-04-23.
 - bbatsov is best for small, pragmatic quality-of-life upgrades and modern
   defaults that can land as tight cleanup commits.
 - abo-abo is now an active counter-signal rather than a dormant reference:
   still Ivy/Counsel/Hydra/Flycheck-flavored, but using Eglot/Ruff/vterm and
   pruning unused package surface.
 - Sacha is useful when the question touches Org, publishing, blogging,
-  transcription, or "what has filtered into long-running daily use?"
+  transcription, or "what has filtered into long-running daily use?" She is
+  now also a practical gptel / agent-shell reference rather than only an
+  Org/blogging reference.
+
+## Secondary AI Sources
+
+These are not tracked as personal-config ground truth, but they should be
+consulted during AI work:
+
+- `karthink/gptel` and https://gptel.org/ — package-level truth for backend
+  support, tool use, MCP integration, multimodal context, and transient UI.
+- `xenodium/agent-shell` — package-level truth for ACP agent shells, supported
+  agents, environment handling, MCP server config, and container path
+  resolution.
+- `MatthewZMD/aidermacs` and `tninja/aider.el` — package-level truth for
+  Aider-style pair programming from Emacs.
+- John Kitchin's RAG packages (`jkitchin/emacs-rag-libsql`,
+  `jkitchin/org-db-v3`) — secondary package context to read alongside
+  tracked `jkitchin-scimax` when an AI sub-goal reaches retrieval or
+  Org/DB-backed context.
+- Mastering Emacs / Mickey Petersen — useful as blog and package context
+  (e.g. Combobulate, ligatures, shell/editor workflow), but no current public
+  personal Emacs config was found during this pass.
 
 ## Per-repo notes
 
@@ -281,7 +315,7 @@ docker-tramp`.
 ### sacha-chua-dotemacs
 
 Sacha Chua's `.emacs.d`. Organic, blog/journaling-heavy, less of a clean
-migration source.
+migration source, but now a concrete practical AI-workflow reference.
 
 Latest commit at last sync: `44d6958 2026-04-18 PDF` (on `gh-pages`
 branch — her config is published as her blog).
@@ -291,11 +325,19 @@ branch — her config is published as her blog).
 - Phase 0 landscape: organic-evolution profile.
 - drop-dash-s-f: confirmed.
 - drop-hydra: confirmed.
+- 2026-04-26 AI reference expansion: `Sacha.org` now has `gptel`
+  backends for Groq, Gemini, paid Gemini, and Mistral; a custom
+  `sacha-gptel-set-model`; `agent-shell` defaults for Claude Code; and
+  task-specific `gptel-request` workflows for language learning.
 
 **Likely future relevance:**
 
-- Lower than the others — her config is shaped around blogging /
-  transcript / publishing workflows that don't map onto Jeff's daily use.
+- Practical AI workflows inside Org, especially small task-specific
+  `gptel-request` helpers and "what actually stuck in daily use?"
+  patterns.
+- Still lower than jwiegley / yqrashawn for agentic coding architecture;
+  her config is shaped around blogging, transcript, publishing, and
+  learning workflows that only partially map onto Jeff's daily use.
 - Useful for org-modern adoption notes (she has commits about it).
 - Useful for `goto-chg` / `substitute` / `minibuffer-regexp-mode`
   evaluations.
@@ -307,6 +349,10 @@ branch — her config is published as her blog).
   do). She's a good "what's filtering down to working users?" indicator.
 - Whisperx (small model) for live transcription — relevant if we ever
   explore audio-input sub-goals.
+- `gptel` backend matrix includes Groq, Gemini, paid Gemini, and Mistral
+  with API keys read from environment variables.
+- `agent-shell` is present with Claude Code as the preferred agent and a
+  custom per-working-directory dot-subdir function.
 - Streaming-related commits (her live coding sessions).
 - yas-minor-mode-map TAB conflict resolution — small note for if/when
   we hit similar yasnippet/mode interactions.
@@ -346,6 +392,155 @@ edge-tts-speak-region`.
 - `Prefer packages via Guix, again` — uses Guix (Linux) for package
   management. Less directly relevant for Jeff's macOS setup but
   illuminates his deployment style.
+
+### redguardtoo-emacs.d
+
+Chen Bin's `emacs.d`. Very popular, active, and useful as the compact
+local-first AI counterpoint to jwiegley's large stack.
+
+Latest commit at last sync: `8c892ed7 2026-04-19 use apeleia to format code`.
+
+**What we've extracted so far:**
+
+- 2026-04-26 AI reference expansion: `lisp/init-ai.el` configures `gptel`
+  with local Ollama backends for DeepSeek R1 and Gemma 3n, org-mode chat
+  buffers, presets, prompt directives, and `gptel-include-reasoning nil`.
+- Same module wires Aider to local Ollama models and adds small project /
+  commit analysis helpers around `gptel-request`.
+
+**Likely future relevance:**
+
+- Best small reference for "local model first, minimum Emacs surface" and
+  for deciding which parts of AI integration can stay lightweight.
+- Re-read before local Ollama, local Aider, or one-off code-review helper
+  sub-goals.
+
+### abougouffa-minemacs
+
+Abdelhak Bougouffa's MinEmacs framework. More of an Emacs distribution
+than a single personal init, but active and broad enough to be useful for
+package-stack comparisons.
+
+Latest commit at last sync: `ae4967d6 2026-04-26 chore(version): v14.0.0`.
+
+**What we've extracted so far:**
+
+- 2026-04-26 AI reference expansion: `modules/me-ai.el` combines `llm`,
+  `llm-ollama`, `llm-models`, Ellama, gptel, Aidermacs, `mcp-hub`, and
+  Whisper in one module.
+- Shows local-backend choices for Ollama and llama.cpp, dynamic Aidermacs
+  model selection from available Ollama models, and an MCP-to-Ellama-tools
+  bridge.
+
+**Likely future relevance:**
+
+- Useful when comparing gptel-first versus Ellama/`llm` abstractions.
+- Re-read for MCP server registration and "many AI packages in one module"
+  tradeoffs.
+
+### matthewzmd-emacs.d
+
+Matthew Zeng's M-EMACS configuration. Useful mainly because Matthew is the
+Aidermacs author; the personal AI surface is smaller than the package repo.
+
+Latest commit at last sync: `e8a999b 2026-03-14 Update stuff`.
+
+**What we've extracted so far:**
+
+- 2026-04-26 AI reference expansion: `elisp/init-llm.el` configures
+  Aidermacs with `comint`, disables auto-commits, uses OpenRouter Gemini
+  as the default model, and sets a DeepSeek weak model.
+- Same file enables Emigo against OpenRouter, using `OPENROUTER_API_KEY`
+  from the environment.
+
+**Likely future relevance:**
+
+- Re-read when evaluating Aidermacs defaults, model split between primary
+  and weak model, and whether to use `comint` or terminal-backed agent UI.
+- Treat `MatthewZMD/aidermacs` itself as the package-level source of truth.
+
+### manateelazycat-lazycat-emacs
+
+Andy Stewart's `lazycat-emacs`. Highly customized, large surface area, and
+useful for seeing AI packages inside a long-running personal config.
+
+Latest commit at last sync: `200684c3 2026-02-23 Fix key echo error.`
+
+**What we've extracted so far:**
+
+- 2026-04-26 AI reference expansion: `site-lisp/config/init-gptel.el`
+  configures gptel through OpenRouter, binds RET in `gptel-mode`, and adds
+  a small `gptel-request` helper for pinyin-to-Chinese conversion.
+- `init-aidermacs.el` configures Aidermacs with OpenRouter Claude 3.7
+  Sonnet; `init-emigo.el` enables Emigo with OpenRouter Gemini 2.5; the
+  repo also has `init-whisper.el`.
+
+**Likely future relevance:**
+
+- Useful for OpenRouter-centric setups, Emigo comparison, and "AI as a
+  cluster of small packages" rather than one gptel-only stack.
+- Less useful as a clean migration template; expect many local conventions.
+
+### yqrashawn-yqdotfiles
+
+Yuan Fu's dotfiles. Advanced Doom-based AI reference with substantial
+custom gptel tooling, MCP server work, proxy backends, and tests.
+
+Latest commit at last sync: `900106d4 2026-04-25 fix: auq`.
+
+**What we've extracted so far:**
+
+- 2026-04-26 AI reference expansion: `.doom.d/llm.el` builds a large gptel
+  preset matrix for Claude Code, OpenRouter, GitHub Copilot, and Codex-like
+  local proxy backends.
+- `.doom.d/gptel-tools/` contains tested tools for file creation/editing,
+  reading, buffers, ripgrep, shell, linting, memory, imenu, treesit, todo,
+  and workspace context.
+- `.doom.d/packages.el` includes gptel, Elysium, chatgpt-shell, Whisper,
+  Copilot, Aidermacs, MCP, `mcp-server-lib`, `elisp-dev-mcp`,
+  `agent-shell`, `agent-shell-sidebar`, and `agent-shell-manager`.
+
+**Likely future relevance:**
+
+- New HIGH-tier AI reference for agentic gptel architecture, custom tool
+  design, MCP/server integration, and local proxy adapters for external
+  coding agents.
+- Re-read alongside jwiegley before designing any serious tool-use or
+  agent-shell sub-goal; use redguardtoo if the desired answer is smaller.
+
+### jkitchin-scimax
+
+John Kitchin's scimax starterkit for scientists and engineers. This is the
+right Kitchin repo to track; `jkitchin/jmax` exists, but last moved in 2018
+and is not a current config reference.
+
+Latest commit at last sync: `f1f12ac1 2026-04-23 Update README with scimax
+development status`.
+
+**What we've extracted so far:**
+
+- 2026-04-26 Kitchin follow-up: track `jkitchin/scimax` as scientific
+  Org / org-db / RAG context, not as a top-tier current AI implementation.
+- `README.org` says the 2025 scimax 4.0 direction included LLM/gptel energy,
+  a non-public `scimax-gptel` package with tool and MCP integration for
+  scientific writing, and an org-db rewrite for semantic search.
+- `org-db-v2/` and `scimax.org` are concrete references for indexing Org
+  material into SQLite, full-text search, image/audio support, and agenda
+  workflows.
+
+**Likely future relevance:**
+
+- Re-read for scientific notebook patterns, Org database indexing, and
+  retrieval-shaped context before designing any RAG or research-note AI
+  workflow.
+- Keep `jkitchin/emacs-rag-libsql` and `jkitchin/org-db-v3` as package-level
+  secondary sources for newer retrieval experiments.
+
+**Caveat:**
+
+- The 2026-04-23 README says Kitchin no longer uses Emacs and is
+  discontinuing scimax development, so do not treat this as a current
+  daily-use AI config unless upstream activity resumes.
 
 ## Workflow
 
@@ -396,12 +591,11 @@ synthesis update needed.
 
 Current inventory-only notes:
 
-- `andreyorst-dotfiles` and `ebzzry-dotfiles`: tracked for continuity; no
-  active synthesis yet.
+- `andreyorst-dotfiles`: tracked for continuity. GitLab / web search did not
+  surface a strong AI/LLM config signal during the 2026-04-26 AI reference
+  expansion, so it remains inventory-only.
 - `danielmai-dotemacs`: historically useful to Jeff's original config, but
   currently lower signal than Purcell/bbatsov for modern migrations.
-- `sirpscl-emacs.d`: dormant/low signal unless a specific topic makes it
-  relevant again.
 
 ## Updating this file
 
