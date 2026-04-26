@@ -1,14 +1,10 @@
 abo-abo-dotemacs https://github.com/abo-abo/oremacs.git 0c5f3284acedc966948cbb930e779af5189fd54e
-andreyorst-dotfiles https://github.com/andreyorst/dotfiles.git eb1e3615b944f2457f38bc4197e84179c2993775
+andreyorst-dotfiles git@gitlab.com:andreyorst/dotfiles.git -
 bbatsov-dotemacs https://github.com/bbatsov/emacs.d.git d6cbae165e2eb100afc4897da58d75c984709333
 danielmai-dotemacs https://github.com/danielmai/.emacs.d.git e2ddab43e1ada5dbef6e47b4f37b1d96b9a0733a
 ebzzry-dotfiles https://github.com/ebzzry/dotfiles.git 653bb962f4be54226c3c0bbdd843766b98486f08
-editorconfig-emacs https://github.com/editorconfig/editorconfig-emacs.git dd394c1ee328c3386ce31ff80350704e73df1c49
-greendog-gtd - 3fc806d2cf4b84265db3e09cde1053f8c804b039
-howardabrams-dot-files https://github.com/howardabrams/dot-files.git 1b54fe75d74670dc7bcbb6b01ea560c45528c628
 jwiegley-dotemacs https://github.com/jwiegley/dot-emacs.git 1d50d3e3f2b2c8cfd993849984a88587fa9b875d
 munen-emacs.d https://github.com/munen/emacs.d.git 010121d75d4196db5b2be1bf5effd6333ed2dd92
 sacha-chua-dotemacs https://github.com/sachac/.emacs.d.git 44d695803c1ad85597f62d44da32091a53b6ccfe
 sirpscl-emacs.d https://github.com/SirPscl/emacs.d.git 74d28f2571b191bbaf778fb76e9f1ad034f2e6ec
-smartparens https://github.com/Fuco1/smartparens.git 9682ba930374a4d62b444950b008d2bca1cffba1
 steve-purcell-dotemacs https://github.com/purcell/emacs.d 5be20de8db784ccf5ee2b2532df3f870c9c4f8dd
