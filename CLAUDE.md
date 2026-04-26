@@ -15,10 +15,11 @@ emacs-config/
 └── reference-emacs-configs/ ← cloned reference repos (read-only, for inspiration)
     ├── abo-abo-dotemacs/
     ├── bbatsov-dotemacs/
-    ├── howardabrams-dot-files/
     ├── jwiegley-dotemacs/
+    ├── munen-emacs.d/
     ├── sacha-chua-dotemacs/
-    └── ... (14 repos total)
+    ├── steve-purcell-dotemacs/
+    └── ... (see reference-repos.list)
 ```
 
 ## literate-emacs.d — the active project
@@ -34,9 +35,9 @@ Future feature branches will appear as sibling directories to `main/` (e.g., `li
 
 `reference-emacs-configs/` is a local cache of other developers' Emacs configs used as ground truth during investigations. The directory is gitignored at workspace level — repos in it are *not* committed; each has its own upstream origin.
 
-**Tracked repos** are listed in `reference-repos.list` at the workspace root. Each line is three whitespace-delimited fields: `name url last-known-sha`. The `last-known-sha` is the upstream commit at which we last analyzed the repo; comparing it to current upstream tells us what's new since then. URLs of `-` mean a local-only repo with no upstream (rare; one current case is `greendog-gtd`).
+**Tracked repos** are listed in `reference-repos.list` at the workspace root. Each line is three whitespace-delimited fields: `name url last-known-sha`. The `last-known-sha` is the upstream commit at which we last analyzed the repo; comparing it to current upstream tells us what's new since then. A SHA of `-` means the inventory has not captured a local HEAD for that repo yet.
 
-The synthesis file `reference-configs.md` describes what each tracked repo is for and what we've already extracted from each. The inventory tracks all repos on disk; the synthesis covers only the subset we actively analyze.
+The synthesis file `reference-configs.md` is the canonical home for reference-repo analysis: what each tracked repo is for, which repos are active references, and what we've already extracted from each. The inventory tracks registered repos; the synthesis covers the subset we actively analyze. Roadmap files such as `literate-emacs.d/main/emacs-2026-landscape.org` should link to this synthesis rather than duplicating per-repo surveys.
 
 ### Workflow
 

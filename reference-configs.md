@@ -1,9 +1,10 @@
 # Reference Emacs configs — synthesis
 
-This file is the canonical record of which other developers' Emacs configs we
-treat as ground-truth references during investigations, and what we've
-already extracted from each. It is committed to the workspace repo and
-travels with the project. The actual cloned repos in
+This file is the canonical home for analysis of other developers' Emacs
+configs: which repos we treat as ground-truth references during
+investigations, what we've already extracted from each, and how recent
+upstream changes should influence Jeff's roadmap. It is committed to the
+workspace repo and travels with the project. The actual cloned repos in
 `reference-emacs-configs/` are a per-machine cache, rebuildable from the
 inventory in `reference-repos.list` via `just ref-show-plan`.
 
@@ -21,6 +22,20 @@ The other inventory-only repos are tracked for state preservation but are not
 subjects of ongoing investigation. Any of them can be promoted to active
 analysis by adding a section here; the inventory tooling already snapshots
 their state.
+
+## Relationship to the Landscape Document
+
+`literate-emacs.d/main/emacs-2026-landscape.org` owns Jeff's modernization
+roadmap: the section-by-section map, shipped work, pending backlog, and open
+questions. This file owns the reference-repo intelligence that feeds that
+roadmap.
+
+When `just ref-show-changes` turns up new upstream commits:
+
+1. Summarize the repo-specific signal here.
+2. Update the landscape only if the signal changes a recommendation,
+   priority, shipped-note, or pending sub-goal.
+3. Avoid duplicating repo-by-repo commit surveys in the landscape.
 
 ## Tracked repos at a glance
 
@@ -42,8 +57,28 @@ Tier definitions:
 
 - **HIGH** — Active source for current or imminent sub-goals.
 - **MEDIUM** — Useful for specific topic areas; consult when those areas come up.
-- **LOW / DORMANT** — Either inactive upstream or supplanted by HIGH/MEDIUM
-  refs. Currently un-tracked; can be re-added via `just ref-add` if needed.
+- **LOW / DORMANT** — Either inactive upstream, inventory-only, or
+  supplanted by HIGH/MEDIUM refs. Promote by adding a section here when a
+  specific question makes the repo relevant again.
+
+## Current Landscape-Level Signals
+
+These are the cross-repo conclusions that currently matter most to
+Jeff's roadmap:
+
+- Purcell remains the cleanest migration reference for language tooling and
+  built-in-era Emacs defaults. Re-read him before Terraform, eat, undo, or
+  any broad language-mode work.
+- jwiegley and munen are the two AI references. jwiegley shows the ambitious
+  ceiling (gptel presets, local-model orchestration, MCP-adjacent tooling);
+  munen shows a smaller custom-tools shape.
+- bbatsov is best for small, pragmatic quality-of-life upgrades and modern
+  defaults that can land as tight cleanup commits.
+- abo-abo is now an active counter-signal rather than a dormant reference:
+  still Ivy/Counsel/Hydra/Flycheck-flavored, but using Eglot/Ruff/vterm and
+  pruning unused package surface.
+- Sacha is useful when the question touches Org, publishing, blogging,
+  transcription, or "what has filtered into long-running daily use?"
 
 ## Per-repo notes
 
@@ -358,6 +393,15 @@ tracked for state preservation. `just ref-show-changes` reports their
 upstream activity along with the others; if anything notable happens, we can
 promote one to active analysis by writing a section here. Until then, no
 synthesis update needed.
+
+Current inventory-only notes:
+
+- `andreyorst-dotfiles` and `ebzzry-dotfiles`: tracked for continuity; no
+  active synthesis yet.
+- `danielmai-dotemacs`: historically useful to Jeff's original config, but
+  currently lower signal than Purcell/bbatsov for modern migrations.
+- `sirpscl-emacs.d`: dormant/low signal unless a specific topic makes it
+  relevant again.
 
 ## Updating this file
 
