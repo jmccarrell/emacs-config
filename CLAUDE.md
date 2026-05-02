@@ -99,6 +99,8 @@ When a spec arrives, Claude reads it, may discuss approach in chat, then (after 
 
 Before starting work in a worktree, Claude should look in `specs/` for a relevant numbered spec. If the work has no spec, Claude surfaces that — for anything multi-step, it may be worth writing a spec first so the intent is captured durably rather than only in chat.
 
+Specs come in a handful of recognizable shapes (broad exploratory, narrow directive, pushback, extension). `spec-shapes.md` at the workspace root catalogs those shapes — what to look for, what to investigate, how to decompose. Read it when handed a spec. The catalog is meant to evolve as new specs reveal new shapes.
+
 ## TASK.md convention
 
 When working in a worktree (including `main/`), a `TASK.md` file in the worktree root describes what that worktree is currently working on. This file is **not tracked in git** (it is gitignored or excluded per-worktree). It provides immediate context to any Claude session about the current goal, approach, and relevant notes.
