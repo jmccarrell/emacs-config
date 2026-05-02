@@ -26,6 +26,19 @@ What intake does **not** produce:
 
 ## Workflow
 
+### Step 0 — Confirm sync state
+
+Before reading the spec, run read-only sync checks against both repos. Jeff works across multiple machines (see workspace `CLAUDE.md` "Multi-machine workflow"); planning a sub-goal against a stale view of the codebase is worse than 15 seconds of `git fetch`.
+
+```sh
+cd /Users/jeff/jwm/proj/emacs-config && git fetch && git status -sb
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/.bare && git fetch origin
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main && git status -sb
+# Repeat git status -sb in any other active feature worktree.
+```
+
+Report drift back to Jeff. If either repo is behind origin, recommend `git pull --ff-only` before proceeding. **Do not block** — Jeff decides whether to sync first or proceed against current state. The point is to surface drift, not to gate the workflow.
+
 ### Step 1 — Read the spec and its context
 
 Read the spec itself. Then read referenced material:

@@ -23,6 +23,42 @@ emacs-config/
     └── ... (see reference-repos.list)
 ```
 
+## Multi-machine workflow
+
+Jeff works on this project across multiple machines, sync'd via git. Two repos are in play:
+
+- The workspace repo at `/Users/jeff/jwm/proj/emacs-config/` (tracks `specs/`, this `CLAUDE.md`, `spec-shapes.md`, `skills/`, `justfile`, `reference-repos.list`, `reference-configs.md`).
+- The `literate-emacs.d` bare repo and its worktrees (tracks the literate config and the tangled `init.el`).
+
+**Branches sync; worktrees do not.** A worktree's `.git` pointer file contains absolute filesystem paths, so worktree directories are not portable across machines. The branch is the shared abstraction — sync via `git push` / `git pull`. On a new machine, create a fresh worktree from the (already-sync'd) branch.
+
+What does *not* cross machines:
+
+- Worktree directories under `literate-emacs.d/<feature>/` — recreate per machine via `git worktree add`.
+- The per-worktree `info/exclude` for `TASK.md` — re-add per machine.
+- `TASK.md` itself — gitignored; reconstruct from chat + the originating spec if needed.
+- `~/.emacs.d/init.el` symlink target — repoint per machine.
+- `reference-emacs-configs/` cache — regenerate via `just ref-show-plan`.
+
+### Session-start sync
+
+At the start of any planning or implementation session, sync both repos with origin. The check is read-only; the pull is Jeff-side.
+
+```sh
+# Workspace repo
+cd /Users/jeff/jwm/proj/emacs-config && git fetch && git status -sb
+# if behind: git pull --ff-only
+
+# literate-emacs.d bare repo
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/.bare && git fetch origin
+
+# Each active worktree (main and any feature)
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main && git status -sb
+# if behind: git pull --ff-only
+```
+
+Claude can run the read-only checks (`git fetch`, `git status -sb`) and report drift; Jeff runs any `git pull` himself. The `emacs-spec-intake` skill includes this as step 0 of any spec-driven work. Drift is surfaced, not gated — Jeff decides whether to sync first or proceed against current state.
+
 ## literate-emacs.d — the active project
 
 This is a **bare git repo with worktrees**. All active work happens inside a worktree directory (e.g., `main/`), never at the `literate-emacs.d/` level itself.
@@ -137,6 +173,27 @@ ln -sf "$PWD/init.el" ~/.emacs.d/init.el
 git worktree remove ../<feature>
 git branch -d <feature>
 ```
+
+### Cross-machine continuation
+
+To pick up a feature branch on a different machine after it was started elsewhere and pushed to origin:
+
+```sh
+# Sync the bare repo so origin/<feature> is known locally
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/.bare
+git fetch origin
+
+# Create a fresh worktree tracking the existing remote branch
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main
+git worktree add -B <feature> ../<feature> origin/<feature>
+cd ../<feature>
+GITDIR="$(git rev-parse --git-dir)"
+mkdir -p "$GITDIR/info"
+echo 'TASK.md' >> "$GITDIR/info/exclude"
+ln -sf "$PWD/init.el" ~/.emacs.d/init.el
+```
+
+The `-B <feature>` form creates or resets a local branch to match `origin/<feature>`, so the worktree is a normal tracking branch on this machine. The per-worktree `info/exclude`, the symlink, and `TASK.md` (reconstructed from chat + the originating spec) are all per-machine state and have to be re-established here.
 
 ### Sub-goal pre-implementation checklist
 
