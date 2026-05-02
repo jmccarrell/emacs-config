@@ -6,6 +6,7 @@ This folder is a workspace containing Jeff's Emacs configuration project and a c
 
 ```
 emacs-config/
+├── specs/                   ← numbered briefs from Jeff (durable, git-tracked)
 ├── literate-emacs.d/        ← Jeff's Emacs config (worktree-enabled repo)
 │   ├── .bare/               ← bare git repo (origin: git@github.com:jmccarrell/literate-emacs.d.git)
 │   ├── .git                 ← pointer file to .bare (do not edit)
@@ -84,6 +85,19 @@ just ref-list
 - **`ref-update-inventory`**: capture each repo's current local HEAD into its inventory `last-known-sha`. Run after consuming changes.
 
 **Workflow rule:** before starting an investigation, read `reference-configs.md` to identify which tracked repos are relevant. If a needed repo isn't tracked yet, add it via `just ref-add`. Treat these repos as read-only — don't commit to them or modify them; they're regenerable cache.
+
+## specs/ — durable briefs
+
+Numbered Markdown files in `specs/` (e.g. `specs/003-local-ai-in-emacs-1.md`) capture Jeff's intent before implementation. Each spec is short and addressed to Claude: what to do, why, sometimes corrections to a previous proposal (e.g. `002-improve-reference-repo-tracking.md` pushed back on outcomes from `001-plan-reference-repos.md`). Specs are git-tracked and persist as project history.
+
+Specs are **upstream** of TASK.md:
+
+- A spec is the ask. It sets scope and lives forever.
+- A TASK.md is the plan-of-record for one worktree implementing one slice of a spec. It is gitignored and disposable.
+
+When a spec arrives, Claude reads it, may discuss approach in chat, then (after a worktree is created) writes a TASK.md whose Goal narrowly restates one sub-goal of the spec and whose Why links back to `specs/NNN-….md`. A single broad spec (like `003`, "AI/LLM integration") can produce multiple TASK.md files across multiple worktrees.
+
+Before starting work in a worktree, Claude should look in `specs/` for a relevant numbered spec. If the work has no spec, Claude surfaces that — for anything multi-step, it may be worth writing a spec first so the intent is captured durably rather than only in chat.
 
 ## TASK.md convention
 
