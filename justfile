@@ -97,6 +97,22 @@ ref-show-changes:
        echo ""; \
      done < reference-repos.list
 
+# Install the pre-push hook (soft warn on unsquashed fixups) into
+# the literate-emacs.d bare repo's hooks directory.
+#
+# Why this is a recipe and not a one-off: hooks live in .bare/hooks/
+# which is not tracked by git (it's per-machine state on a fresh
+# clone). The canonical source is hooks/pre-push at the workspace
+# root, which IS tracked. This recipe copies the source into the
+# install location and chmods it executable.
+#
+# Per-machine setup; rerun if you pull a change that touches
+# hooks/pre-push to refresh the installed copy. Idempotent.
+install-fixup-hook:
+    @cp hooks/pre-push literate-emacs.d/.bare/hooks/pre-push
+    @chmod +x literate-emacs.d/.bare/hooks/pre-push
+    @echo "install-fixup-hook: installed to literate-emacs.d/.bare/hooks/pre-push"
+
 # Capture each repo's current local HEAD into the inventory's
 # last-known-sha column. Run after consuming ref-show-changes
 # output into reference-configs.md and any subsequent git pulls.

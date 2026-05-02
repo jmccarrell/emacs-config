@@ -62,7 +62,7 @@ State which sub-goal I'd start with and why. Usually the lowest-risk first — g
 
 Once Jeff approves the decomposition and picks a sub-goal to start:
 
-- **literate-emacs.d worktree changes** — point at workspace `CLAUDE.md`'s "Feature worktrees (for Claude agents)" section. Jeff creates the worktree; I write the TASK.md inside it. The TASK.md's Goal is the sub-goal; the Why links to the spec.
+- **literate-emacs.d worktree changes** — point at workspace `CLAUDE.md`'s "Feature worktrees (for Claude agents)" section. Jeff creates the worktree; I write the TASK.md inside it. The TASK.md's Goal is the sub-goal; the Why links to the spec. During execution, recommend `just fixup` at natural checkpoints (after `just verify-tangle` passes, after a verification step in TASK.md passes); recommend `just squash` at sub-goal close. Full git workflow lives in `literate-emacs.d/main/CLAUDE.md`'s "Git workflow within a feature worktree" section.
 - **Workspace-level edits** — point at workspace `CLAUDE.md`'s "Meta-doc edits" rule: direct edits with an explicit commit command in the same response.
 - **Investigations that don't change config** — e.g. extending `reference-configs.md` with a new survey. No worktree needed; the result lands as a doc edit.
 

@@ -39,6 +39,7 @@ What does *not* cross machines:
 - `TASK.md` itself — gitignored; reconstruct from chat + the originating spec if needed.
 - `~/.emacs.d/init.el` symlink target — repoint per machine.
 - `reference-emacs-configs/` cache — regenerate via `just ref-show-plan`.
+- Git hooks in `literate-emacs.d/.bare/hooks/` — install via `just install-fixup-hook` from the workspace root. Canonical source: `hooks/pre-push` (tracked).
 
 ### Session-start sync
 
@@ -224,6 +225,10 @@ emacs --batch -l org \
 Confirmed byte-identical to interactive `M-x org-babel-tangle`. Cold-run wall time is ~480ms on Apple Silicon.
 
 In TASK.md "Tangle steps" sections, Claude should suggest `just tangle` (shell-side, no Emacs context-switch) as the primary path, and `M-x org-babel-tangle` as the alternate. Claude itself cannot run these in the sandbox today (no `emacs` binary), but the recipes are the same on both sides.
+
+### Git workflow
+
+Sub-goal commits use **fixup commits** during the worktree's life (in-flight checkpoints) and autosquash rebase at sub-goal close. The full workflow — fixup loop, the literate-config rule that org and `init.el` must commit together, close pattern, pre-push hook — lives in `literate-emacs.d/main/CLAUDE.md`'s "Git workflow within a feature worktree" section. The per-worktree justfile carries `just fixup`, `just squash`, and `just fixups-pending`. The pre-push warning hook is per-machine setup; install via `just install-fixup-hook` from the workspace root.
 
 ### Info-node grounding for investigations
 
