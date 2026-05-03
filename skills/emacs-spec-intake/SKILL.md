@@ -31,13 +31,14 @@ What intake does **not** produce:
 Before reading the spec, run read-only sync checks against both repos. Jeff works across multiple machines (see workspace `CLAUDE.md` "Multi-machine workflow"); planning a sub-goal against a stale view of the codebase is worse than 15 seconds of `git fetch`.
 
 ```sh
+# Workspace repo (not bare-root): fetch + status.
 cd /Users/jeff/jwm/proj/emacs-config && git fetch && git status -sb
-cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/.bare && git fetch origin
-cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main && git status -sb
-# Repeat git status -sb in any other active feature worktree.
+
+# Bare-root project: per-worktree drift report against origin.
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main && just wt::status
 ```
 
-Report drift back to Jeff. If either repo is behind origin, recommend `git pull --ff-only` before proceeding. **Do not block** — Jeff decides whether to sync first or proceed against current state. The point is to surface drift, not to gate the workflow.
+The bare-root project's drift report comes from the `wt::status` recipe wired in via the `git-worktree-flow` skill (`mod wt`); it fetches origin and reports per-worktree status in one shot. Report drift back to Jeff. If either repo is behind, recommend `git pull --ff-only` before proceeding. **Do not block** — Jeff decides whether to sync first or proceed against current state. The point is to surface drift, not to gate the workflow.
 
 ### Step 1 — Read the spec and its context
 

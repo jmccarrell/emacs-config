@@ -5,7 +5,7 @@
 # WHY THIS EXISTS
 # ---------------
 # When using `just fixup` to checkpoint in-flight work during a sub-goal,
-# it's easy to forget to run `just squash` (autosquash rebase) before
+# it's easy to forget to run `just wt::squash` (autosquash rebase) before
 # pushing. Pushing unsquashed fixups to origin is rarely intended:
 # the branch history ends up cluttered with `fixup! <msg>` commits
 # that should have been collapsed into their target.
@@ -45,7 +45,7 @@ if [ -n "$fixups" ]; then
     echo "WARNING: branch '$current_branch' contains unsquashed fixup commits:"
     echo "$fixups" | sed 's/^/  /'
     echo ""
-    echo "Consider 'just squash' before pushing."
+    echo "Consider 'just wt::squash' (or 'just wt::close' at sub-goal end) before pushing."
     echo "Push with 'git push --no-verify' to bypass this warning intentionally."
     echo ""
 fi
