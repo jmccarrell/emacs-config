@@ -23,51 +23,43 @@ emacs-config/
     └── ... (see reference-repos.list)
 ```
 
+## literate-emacs.d — the active project
+
+`literate-emacs.d/` is a **bare git repo with worktrees**. All active work happens inside a worktree directory (e.g., `main/`), never at the `literate-emacs.d/` level itself. Future feature branches appear as sibling directories to `main/`.
+
+The bare-root layout is governed by the `git-worktree-flow` skill — apply that skill for the generic mechanics: session-start sync, starting / closing a feature, cross-machine continuation, fixup loop, pre-push hook, sandbox path-translation, and the "Claude reads; Jeff acts on mutating git commands" rule. `literate-emacs.d/main/justfile` wires `mod wt '~/.config/just/worktree.just'`, so `just wt::new`, `just wt::status`, `just wt::fixup`, `just wt::close`, etc. are available from any worktree.
+
+For literate-config conventions (org/init.el coupling, key files, architecture), read `literate-emacs.d/main/CLAUDE.md`. The rest of *this* document covers workspace-level concerns and emacs-config-specific deviations from the worktree flow.
+
 ## Multi-machine workflow
 
-Jeff works on this project across multiple machines, sync'd via git. Two repos are in play:
+Two repos are in play across machines:
 
-- The workspace repo at `/Users/jeff/jwm/proj/emacs-config/` (tracks `specs/`, this `CLAUDE.md`, `spec-shapes.md`, `skills/`, `justfile`, `reference-repos.list`, `reference-configs.md`).
-- The `literate-emacs.d` bare repo and its worktrees (tracks the literate config and the tangled `init.el`).
+- The workspace repo at `/Users/jeff/jwm/proj/emacs-config/` — a normal git repo (not bare-root). Tracks `specs/`, this `CLAUDE.md`, `spec-shapes.md`, `skills/`, `justfile`, `reference-repos.list`, `reference-configs.md`, `hooks/`.
+- The `literate-emacs.d/` bare repo and its worktrees — bare-root layout governed by `git-worktree-flow`.
 
-**Branches sync; worktrees do not.** A worktree's `.git` pointer file contains absolute filesystem paths, so worktree directories are not portable across machines. The branch is the shared abstraction — sync via `git push` / `git pull`. On a new machine, create a fresh worktree from the (already-sync'd) branch.
+Workspace-specific per-machine state (does not cross machines):
 
-What does *not* cross machines:
+- `~/.emacs.d/init.el` symlink target — repoint per machine when creating or removing a feature worktree.
+- `reference-emacs-configs/` cache — regenerate via `just ref-show-plan` from workspace root.
+- Git hooks in `literate-emacs.d/.bare/hooks/` — install via `just install-fixup-hook` from workspace root. Canonical source: `hooks/pre-push` (tracked).
 
-- Worktree directories under `literate-emacs.d/<feature>/` — recreate per machine via `git worktree add`.
-- The per-worktree `info/exclude` for `TASK.md` — re-add per machine.
-- `TASK.md` itself — gitignored; reconstruct from chat + the originating spec if needed.
-- `~/.emacs.d/init.el` symlink target — repoint per machine.
-- `reference-emacs-configs/` cache — regenerate via `just ref-show-plan`.
-- Git hooks in `literate-emacs.d/.bare/hooks/` — install via `just install-fixup-hook` from the workspace root. Canonical source: `hooks/pre-push` (tracked).
+`TASK.md` is **branch-tracked** (committed alongside the work it describes; removed by `just wt::close` before squash) — see the skill's TASK.md convention. It travels cross-machine via the branch.
 
 ### Session-start sync
 
 At the start of any planning or implementation session, sync both repos with origin. The check is read-only; the pull is Jeff-side.
 
 ```sh
-# Workspace repo
+# Workspace repo (not bare-root): fetch + status.
 cd /Users/jeff/jwm/proj/emacs-config && git fetch && git status -sb
 # if behind: git pull --ff-only
 
-# literate-emacs.d bare repo
-cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/.bare && git fetch origin
-
-# Each active worktree (main and any feature)
-cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main && git status -sb
-# if behind: git pull --ff-only
+# Bare-root project: fetch origin + per-worktree status against remote.
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main && just wt::status
 ```
 
-Claude can run the read-only checks (`git fetch`, `git status -sb`) and report drift; Jeff runs any `git pull` himself. The `emacs-spec-intake` skill includes this as step 0 of any spec-driven work. Drift is surfaced, not gated — Jeff decides whether to sync first or proceed against current state.
-
-## literate-emacs.d — the active project
-
-This is a **bare git repo with worktrees**. All active work happens inside a worktree directory (e.g., `main/`), never at the `literate-emacs.d/` level itself.
-
-For project conventions, key files, and architecture, read:
-`literate-emacs.d/main/CLAUDE.md`
-
-Future feature branches will appear as sibling directories to `main/` (e.g., `literate-emacs.d/some-feature/`). Each worktree is an independent checkout of a branch.
+Claude runs the read-only checks and reports drift; Jeff runs any `git pull` himself. The `emacs-spec-intake` skill includes this as Step 0 of any spec-driven work. Drift is surfaced, not gated — Jeff decides whether to sync first or proceed against current state.
 
 ## reference-emacs-configs — read-only references
 
@@ -130,7 +122,7 @@ Numbered Markdown files in `specs/` (e.g. `specs/003-local-ai-in-emacs-1.md`) ca
 Specs are **upstream** of TASK.md:
 
 - A spec is the ask. It sets scope and lives forever.
-- A TASK.md is the plan-of-record for one worktree implementing one slice of a spec. It is gitignored and disposable.
+- A TASK.md is the plan-of-record for one worktree implementing one slice of a spec. It is branch-tracked during the worktree's life and removed by `just wt::close` before squash, so it never reaches `main`.
 
 When a spec arrives, Claude reads it, may discuss approach in chat, then (after a worktree is created) writes a TASK.md whose Goal narrowly restates one sub-goal of the spec and whose Why links back to `specs/NNN-….md`. A single broad spec (like `003`, "AI/LLM integration") can produce multiple TASK.md files across multiple worktrees.
 
@@ -140,15 +132,40 @@ Specs come in a handful of recognizable shapes (broad exploratory, narrow direct
 
 ## TASK.md convention
 
-When working in a worktree (including `main/`), a `TASK.md` file in the worktree root describes what that worktree is currently working on. This file is **not tracked in git** (it is gitignored or excluded per-worktree). It provides immediate context to any Claude session about the current goal, approach, and relevant notes.
+When working in a worktree, a `TASK.md` file in the worktree root describes what that worktree is currently working on — goal, approach, notes, verification checklist. It provides immediate context to any Claude session.
 
-If a worktree has a `TASK.md`, read it before starting any work in that worktree.
+`TASK.md` is **tracked on the feature branch** (committed alongside the work it describes; travels cross-machine via the branch) and **removed by `just wt::close`** before the squash so it never reaches `main`. See the `git-worktree-flow` skill's TASK.md convention for details. If a worktree has a `TASK.md`, read it before starting any work in that worktree.
 
-## Feature worktrees (for Claude agents)
+## Feature worktrees (for Claude agents) — emacs-config deviations
 
-Claude agents working on this project run in a sandbox that mounts `/Users/jeff/jwm/proj/emacs-config/` at a different absolute path (`/sessions/<session-id>/mnt/emacs-config/`). Git worktrees record absolute paths in their metadata, so a worktree created from one side has a `.git` pointer that cannot be resolved from the other. File tools (Read/Write/Edit) translate paths automatically and work either way — only `git` commands are affected.
+Worktree mechanics (create / track / status / fixup / close / clean) are owned by the `git-worktree-flow` skill and the `wt::` recipes (`just wt::new <feature>`, `just wt::track <feature>`, `just wt::status`, `just wt::fixup`, `just wt::close`, `just wt::clean <feature>`). This section covers what's emacs-config-specific.
+
+### Sandbox path-translation
+
+Claude agents working on this project run in a sandbox that mounts `/Users/jeff/jwm/proj/emacs-config/` at a different absolute path (`/sessions/<session-id>/mnt/emacs-config/`). File tools (Read/Write/Edit) translate paths automatically; only `git` commands inside a worktree are affected. See the skill's "Sandbox path-translation note" for the general rule and the bare-repo workaround.
+
+### `~/.emacs.d/init.el` symlink
 
 `~/.emacs.d/init.el` is a symlink. Its default target is `literate-emacs.d/main/init.el` (main's tangled output). To test a sub-goal's changes without merging, the symlink must be repointed at the feature worktree's `init.el`; a fresh Emacs then loads that `init.el` and picks up the sub-goal's config. `~/.emacs.d/` is outside the sandbox mount, so Claude cannot change the symlink directly — this is always a Jeff-side command.
+
+The symlink repoint is the **emacs-config-specific post-creation step** the skill refers to. After `just wt::new <feature>` (or `just wt::track <feature>`):
+
+```sh
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/<feature>
+ln -sf "$PWD/init.el" ~/.emacs.d/init.el
+```
+
+The worktree's `init.el` starts identical to main's — Jeff still needs to tangle inside the worktree before restarting Emacs to actually pick up the sub-goal's changes.
+
+At sub-goal close, repoint the symlink back at `main` *before* removing the worktree, or it dangles:
+
+```sh
+cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main
+ln -sf "$PWD/init.el" ~/.emacs.d/init.el
+just wt::clean <feature>
+```
+
+### Global Emacs state disclosure
 
 **Rule: Claude discloses non-routine global Emacs state changes before they happen.** Anything under `~/.emacs.d/` or another non-worktree, non-git-managed Emacs location is Jeff-side state, even when a command is legitimate. Routine package installs from package archives already configured in Jeff's Emacs config are expected Emacs work and do not need extra reporting or approval.
 
@@ -156,57 +173,11 @@ For global Emacs files outside the worktree, Claude must distinguish provenance 
 
 Example: `M-x mcp-server-lib-install` may install `~/.emacs.d/emacs-mcp-stdio.sh`. That file is acceptable if it is the package-provided helper for `mcp-server-lib`; the important part is to make its provenance and lifecycle visible before invoking the command, so Jeff is not surprised by an unexplained global helper script. This matters for spikes: if the spike fails, the global state must be torn down; if it works, the global state must be replicated in Jeff's other environments. Claude may inspect these locations read-only when needed, but must not create, modify, remove, install, or regenerate non-routine global Emacs artifacts unless Jeff explicitly approves that specific write in chat. Prefer writing project-tracked source or documenting the Jeff-side command to run.
 
-**Rule: Claude does not edit files in `main/` for a new task or sub-goal.** At the start of any implementation phase, Claude asks Jeff to create a feature worktree before it begins editing. The commands Jeff runs:
-
-```sh
-cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main
-git worktree add ../<feature> -b <feature>
-cd ../<feature>
-GITDIR="$(git rev-parse --git-dir)"
-mkdir -p "$GITDIR/info"
-echo 'TASK.md' >> "$GITDIR/info/exclude"
-ln -sf "$PWD/init.el" ~/.emacs.d/init.el
-```
-
-The `git rev-parse --git-dir` form is necessary because `.git` inside a worktree is a pointer file, not a directory, so plain `.git/info/exclude` won't resolve via the shell. The `mkdir -p` step is required because `git worktree add` does not always create `info/` inside the worktree's gitdir. The `ln -sf` step repoints `~/.emacs.d/init.el` at this worktree's tangled output. Note: the worktree's `init.el` starts identical to main's — Jeff still needs to tangle inside the worktree before restarting Emacs to actually pick up the sub-goal's changes.
-
-After Jeff confirms the worktree exists, Claude writes `TASK.md` and edits source files inside `literate-emacs.d/<feature>/`, using `/Users/jeff/...` paths throughout. Tangling and committing happen on Jeff's side.
-
-Once the branch is merged and `init.el` regenerated, the worktree can be cleaned up. The `init.el` symlink must be pointed back at `main` *before* the worktree is removed, or the symlink dangles on next Emacs start:
-
-```sh
-cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main
-ln -sf "$PWD/init.el" ~/.emacs.d/init.el
-git worktree remove ../<feature>
-git branch -d <feature>
-```
-
-### Cross-machine continuation
-
-To pick up a feature branch on a different machine after it was started elsewhere and pushed to origin:
-
-```sh
-# Sync the bare repo so origin/<feature> is known locally
-cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/.bare
-git fetch origin
-
-# Create a fresh worktree tracking the existing remote branch
-cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/main
-git worktree add -B <feature> ../<feature> origin/<feature>
-cd ../<feature>
-GITDIR="$(git rev-parse --git-dir)"
-mkdir -p "$GITDIR/info"
-echo 'TASK.md' >> "$GITDIR/info/exclude"
-ln -sf "$PWD/init.el" ~/.emacs.d/init.el
-```
-
-The `-B <feature>` form creates or resets a local branch to match `origin/<feature>`, so the worktree is a normal tracking branch on this machine. The per-worktree `info/exclude`, the symlink, and `TASK.md` (reconstructed from chat + the originating spec) are all per-machine state and have to be re-established here.
-
 ### Sub-goal pre-implementation checklist
 
 Before editing files in a new worktree, Claude states in the chat message that kicks off implementation that the following are in place (or explicitly asks Jeff to set them up):
 
-1. Worktree exists at `literate-emacs.d/<feature>/`.
+1. Worktree exists at `literate-emacs.d/<feature>/` (created via `just wt::new <feature>` or `just wt::track <feature>`).
 2. `~/.emacs.d/init.el` is repointed at the worktree's `init.el`.
 3. If the sub-goal adds new packages, `M-x package-refresh-contents` is expected before tangle.
 
@@ -234,7 +205,7 @@ In TASK.md "Tangle steps" sections, Claude should suggest `just tangle` (shell-s
 
 ### Git workflow
 
-Sub-goal commits use **fixup commits** during the worktree's life (in-flight checkpoints) and autosquash rebase at sub-goal close. The full workflow — fixup loop, the literate-config rule that org and `init.el` must commit together, close pattern, pre-push hook — lives in `literate-emacs.d/main/CLAUDE.md`'s "Git workflow within a feature worktree" section. The per-worktree justfile carries `just fixup`, `just squash`, and `just fixups-pending`. The pre-push warning hook is per-machine setup; install via `just install-fixup-hook` from the workspace root.
+The fixup-and-autosquash workflow is owned by the `git-worktree-flow` skill (`just wt::fixup`, `just wt::close`, pre-push hook). The literate-config-specific layer — the rule that `jeff-emacs-config.org` and `init.el` must commit together — is enforced by `just fixup` in `literate-emacs.d/main/justfile`, which wraps `wt::fixup` with the org/init.el sanity check. See `literate-emacs.d/main/CLAUDE.md`'s "Git workflow within a feature worktree" section for the literate-config-specific details. The pre-push warning hook is per-machine setup; install via `just install-fixup-hook` from the workspace root.
 
 ### Info-node grounding for investigations
 
