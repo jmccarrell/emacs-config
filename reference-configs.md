@@ -26,7 +26,7 @@ their state.
 
 ## Relationship to the Landscape Document
 
-`literate-emacs.d/main/emacs-2026-landscape.org` owns Jeff's modernization
+`literate-emacs.d/emacs-2026-landscape.org` owns Jeff's modernization
 roadmap: the section-by-section map, shipped work, pending backlog, and open
 questions. This file owns the reference-repo intelligence that feeds that
 roadmap.

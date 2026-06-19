@@ -34,7 +34,7 @@ Read `/Users/jeff/jwm/proj/emacs-config/spec-shapes.md` if not already in contex
 
 Right investigation depends on the shape. As orientation (`spec-shapes.md` is the source of truth):
 
-- **Broad exploratory** — substantive research. Cheap-and-local first: `literate-emacs.d/main/info-dir.txt` for what's documented, `reference-configs.md` for which tracked repos to consult, `just info-node "(MANUAL) NODE"` for specific manuals. Reference configs next. Web search last.
+- **Broad exploratory** — substantive research. Cheap-and-local first: `literate-emacs.d/info-dir.txt` for what's documented, `reference-configs.md` for which tracked repos to consult, `just info-node "(MANUAL) NODE"` for specific manuals. Reference configs next. Web search last.
 - **Narrow directive** — usually just a thorough grep of the codebase to bound scope. Sometimes a quick reference-config check if the directive touches a package others use.
 - **Pushback/redesign** — read the parent spec's implementation in detail (`git log`, current code). Identify the smallest revert that puts the codebase in a state where the new direction can build cleanly.
 - **Extension/refinement** — usually no fresh investigation; the in-flight plan already carries the context.
@@ -62,7 +62,7 @@ State which sub-goal I'd start with and why. Usually the lowest-risk first — g
 
 Once Jeff approves the decomposition and picks a sub-goal to start:
 
-- **literate-emacs.d worktree changes** — worktree mechanics (create / track / close / clean) live in the `git-worktree-flow` skill; emacs-config-specific deviations (the `~/.emacs.d/init.el` symlink, the literate-config layer) live in workspace `CLAUDE.md`'s "Feature worktrees (for Claude agents) — emacs-config deviations" section. Jeff creates the worktree via `just wt::new <feature>` (then repoints the symlink if the sub-goal changes `init.el`); I write the **branch-tracked** TASK.md inside it. The TASK.md's Goal is the sub-goal; the Why links to the spec. During execution, recommend `just fixup` at natural checkpoints (after `just verify-tangle` passes, after a verification step in TASK.md passes) — `just fixup` is the project wrapper that enforces the literate org/init.el invariant before delegating to `wt::fixup`. Recommend `just wt::close` at sub-goal close (it removes TASK.md before the autosquash). Literate-config-specific git details live in `literate-emacs.d/main/CLAUDE.md`'s "Git workflow within a feature worktree" section.
+- **literate-emacs.d config changes** — for larger or parallel work Jeff creates a feature worktree with `git worktree add ../literate-emacs.d_<feature> -b <feature>` (then repoints the `~/.emacs.d/init.el` symlink if the sub-goal changes `init.el`); see workspace `CLAUDE.md`'s "Feature worktrees (for Claude agents)" section. I write the **branch-tracked** TASK.md inside it: its Goal is the sub-goal, its Why links to the spec. During execution, after `just verify-tangle` passes, stage `jeff-emacs-config.org` and `init.el` together and commit — they must always land in the same commit. Remove TASK.md before the branch is merged. Literate-config git details live in `literate-emacs.d/CLAUDE.md`'s "Git workflow" section.
 - **Workspace-level edits** — point at workspace `CLAUDE.md`'s "Meta-doc edits" rule: direct edits with an explicit commit command in the same response.
 - **Investigations that don't change config** — e.g. extending `reference-configs.md` with a new survey. No worktree needed; the result lands as a doc edit.
 

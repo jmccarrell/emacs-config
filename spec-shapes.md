@@ -29,7 +29,7 @@ If none fit cleanly, note the mismatch in chat, apply the closest shape, and aft
 
 **Framing emphasis (intake):** state what I understand the scope to be, name the high-level constraints, list what *kind* of investigation I'd do. Do not propose sub-goals yet — that's decomposition's job.
 
-**Investigation (decomposition):** substantive. Cheap-and-local first: `literate-emacs.d/main/info-dir.txt` for what's documented locally, `reference-configs.md` for which tracked repos are relevant, then `just info-node "(MANUAL) NODE"` for specific manuals. Reference configs next. Web search last.
+**Investigation (decomposition):** substantive. Cheap-and-local first: `literate-emacs.d/info-dir.txt` for what's documented locally, `reference-configs.md` for which tracked repos are relevant, then `just info-node "(MANUAL) NODE"` for specific manuals. Reference configs next. Web search last.
 
 **Decomposition emphasis:** 3–6 sub-goals, ordered by dependency, easiest first. Be explicit about which sub-goals are research-only vs. config-changing. Lead with a sub-goal that gives Jeff a quick checkpoint before bigger changes land.
 
