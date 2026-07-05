@@ -156,12 +156,16 @@ Claude agents working on this project run in a sandbox that mounts `/Users/jeff/
 
 `~/.emacs.d/init.el` is a symlink. Its default target is `literate-emacs.d/init.el` (the repo's tangled output). To test a feature worktree's changes without merging, repoint the symlink at the feature worktree's `init.el`; a fresh Emacs then loads that `init.el` and picks up the worktree's config. `~/.emacs.d/` is outside the sandbox mount, so Claude cannot change the symlink directly — this is always a Jeff-side command.
 
+The repo justfile has a `link` recipe that manages this symlink. Run it from whichever checkout you want live; it repoints `~/.emacs.d/init.el` there (imperative and idempotent, so it overwrites any prior symlink and creates `~/.emacs.d` on a cold start):
+
 ```sh
-# point at a feature worktree to test it live:
-ln -sf /Users/jeff/jwm/proj/emacs-config/literate-emacs.d_<feature>/init.el ~/.emacs.d/init.el
-# point back at the main checkout when done (before removing the worktree, or it dangles):
-ln -sf /Users/jeff/jwm/proj/emacs-config/literate-emacs.d/init.el ~/.emacs.d/init.el
+# from a feature worktree — point at it to test live:
+cd literate-emacs.d_<feature> && just link
+# from the main checkout — point back when done (before removing the worktree, or it dangles):
+cd literate-emacs.d && just link
 ```
+
+`just link` runs `ln -sfn <this-checkout>/init.el ~/.emacs.d/init.el`; the raw command is equivalent if you need it without just.
 
 The worktree's `init.el` starts identical to the branch point — Jeff still needs to tangle inside the worktree before restarting Emacs to actually pick up the changes.
 
@@ -178,7 +182,7 @@ Example: `M-x mcp-server-lib-install` may install `~/.emacs.d/emacs-mcp-stdio.sh
 Before editing files in a new worktree, Claude states in the chat message that kicks off implementation that the following are in place (or explicitly asks Jeff to set them up):
 
 1. Worktree exists at `literate-emacs.d_<feature>/` (created via `git worktree add ../literate-emacs.d_<feature> -b <feature>`).
-2. `~/.emacs.d/init.el` is repointed at the worktree's `init.el` (if testing the change live).
+2. `~/.emacs.d/init.el` is repointed at the worktree's `init.el` (via `just link` from the worktree, if testing the change live).
 3. If the sub-goal adds new packages, `M-x package-refresh-contents` is expected before tangle.
 
 ### Tangling and verifying via justfile
