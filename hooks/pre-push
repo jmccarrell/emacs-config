@@ -22,13 +22,13 @@
 # HOW TO BYPASS
 # -------------
 # Either run `git push --no-verify`, or remove this hook file
-# (`rm .bare/hooks/pre-push`). The hook is per-machine setup;
+# (`rm .git/hooks/pre-push`). The hook is per-machine setup;
 # reinstall via `just install-fixup-hook` from the workspace root.
 #
 # CANONICAL SOURCE
 # ----------------
 # Source of truth: hooks/pre-push at the workspace root. This installed
-# copy in .bare/hooks/ may drift if the canonical source is updated;
+# copy in .git/hooks/ may drift if the canonical source is updated;
 # rerun `just install-fixup-hook` after pulls that touch the source.
 
 # Skip check if not on a regular branch (e.g. detached HEAD).
