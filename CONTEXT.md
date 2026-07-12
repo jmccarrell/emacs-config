@@ -40,3 +40,33 @@ _Avoid_: Cached repository
 The active Emacs configuration's modernization roadmap. It consumes relevant
 signals from the Reference Synthesis without duplicating repository analysis.
 _Avoid_: Reference synthesis, inventory
+
+**Rust Development Workflow**:
+The Rust-focused editing and feedback experience in the active Emacs
+configuration: navigation, diagnostics, formatting, testing, debugging,
+project tooling, and explicitly scoped AI assistance. It supports both daily
+project work and Rust course exercises. Its AI assistance extends a validated
+Core Rust Loop.
+_Avoid_: Rust setup, Rust support
+
+**Review-First AI Assistance**:
+AI support that works from explicitly selected context and requires review
+before changing code. Inline completion and autonomous editing are separate,
+opt-in capabilities.
+_Avoid_: AI coding assistant, autonomous agent
+
+**Cargo Project**:
+A Rust project described by Cargo, either as a single crate or as a workspace
+of related crates.
+_Avoid_: Rust project, crate repository
+
+**Core Rust Loop**:
+The first usable Rust Development Workflow: editing, navigation, diagnostics,
+formatting, and test execution. Debugging is a later capability, not a
+prerequisite for adoption.
+_Avoid_: Complete IDE, debugger workflow
+
+**Low-Surface-Area Rust Stack**:
+The Rust Development Workflow built first from Emacs 30 capabilities, with
+additional packages adopted only to fill a demonstrated gap.
+_Avoid_: Full Rust IDE distribution, package bundle
