@@ -273,3 +273,17 @@ For workspace-level files (this `CLAUDE.md`, etc.):
 cd /Users/jeff/jwm/proj/emacs-config && \
   git add <file> && git commit -m "<short summary>"
 ```
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs for this workspace live in GitHub Issues. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The default five-role triage vocabulary is in use. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a single-context repository. See `docs/agents/domain.md`.
