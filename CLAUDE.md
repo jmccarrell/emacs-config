@@ -12,7 +12,8 @@ emacs-config/
 │   ├── init.el                   ← generated (tangled from the org file)
 │   ├── CLAUDE.md                 ← repo-level context: conventions, key files, architecture
 │   └── ...
-├── literate-emacs.d_<feature>/   ← optional feature worktree (sibling directory)
+├── literate-emacs.d.worktrees/   ← ignored container for config worktrees
+│   └── <feature>/                ← optional config feature worktree
 └── reference-emacs-configs/      ← cloned reference repos (read-only, for inspiration)
     ├── abo-abo-dotemacs/
     ├── bbatsov-dotemacs/
@@ -25,7 +26,13 @@ emacs-config/
 
 ## literate-emacs.d — the active project
 
-`literate-emacs.d/` is a normal git repo (origin `git@github.com:jmccarrell/literate-emacs.d.git`), checked out on a branch (default `main`). Day-to-day work happens on `main` or a feature branch. For larger or parallel changes, Jeff uses a **git worktree** — a sibling directory such as `literate-emacs.d_<feature>/`, created with `git worktree add`. Worktrees are still part of the flow; the bare-root layout is not.
+`literate-emacs.d/` is a normal git repo (origin `git@github.com:jmccarrell/literate-emacs.d.git`), checked out on a branch (default `main`). Day-to-day work happens on `main` or a feature branch. For larger or parallel changes, Jeff uses a **git worktree** in the repository's `<repo>.worktrees/<feature>/` container: `literate-emacs.d.worktrees/<feature>/`. Worktrees are still part of the flow; the bare-root layout is not.
+
+This convention applies to both repos in this workspace: workspace worktrees
+live beside this checkout in `../emacs-config.worktrees/<feature>/`, and
+literate-config worktrees live in
+`literate-emacs.d.worktrees/<feature>/`. The latter is ignored by the
+workspace repo because each child is owned by the `literate-emacs.d` Git repo.
 
 For literate-config conventions (org/init.el coupling, key files, architecture), read `literate-emacs.d/CLAUDE.md`. The rest of *this* document covers workspace-level concerns and how Claude should work in the repo.
 
@@ -52,7 +59,7 @@ At the start of any planning or implementation session, check both repos against
 ```sh
 cd /Users/jeff/jwm/proj/emacs-config && git fetch && git status -sb
 cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d && git fetch && git status -sb
-# plus any active feature worktree: git -C ../literate-emacs.d_<feature> status -sb
+# plus any active config worktree: git -C ../literate-emacs.d.worktrees/<feature> status -sb
 # if behind: git pull --ff-only
 ```
 
@@ -135,14 +142,18 @@ When working on a feature, a `TASK.md` file in the repo root (or a feature workt
 
 ## Feature worktrees (for Claude agents)
 
-For larger or parallel changes, Jeff uses a git worktree — a sibling directory of `literate-emacs.d/`. The mechanics are plain git; the bare-root layout and the old `wt::*` recipes are gone.
+For larger or parallel changes, Jeff uses a git worktree in the repository's
+`<repo>.worktrees/` container. The mechanics are plain git; the bare-root
+layout and the old `wt::*` recipes are gone. The workspace repo uses the
+sibling container `../emacs-config.worktrees/`; the literate config uses the
+workspace-local container `../literate-emacs.d.worktrees/`.
 
 ```sh
 # from inside the repo, create a worktree + branch (Jeff-side, mutating):
 cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d
-git worktree add ../literate-emacs.d_<feature> -b <feature>
+git worktree add ../literate-emacs.d.worktrees/<feature> -b <feature>
 # tear down when done (after killing its buffers — see below):
-git worktree remove ../literate-emacs.d_<feature>
+git worktree remove ../literate-emacs.d.worktrees/<feature>
 git worktree list   # inspect
 ```
 
@@ -160,7 +171,7 @@ The repo justfile has a `link` recipe that manages this symlink. Run it from whi
 
 ```sh
 # from a feature worktree — point at it to test live:
-cd literate-emacs.d_<feature> && just link
+cd literate-emacs.d.worktrees/<feature> && just link
 # from the main checkout — point back when done (before removing the worktree, or it dangles):
 cd literate-emacs.d && just link
 ```
@@ -181,7 +192,7 @@ Example: `M-x mcp-server-lib-install` may install `~/.emacs.d/emacs-mcp-stdio.sh
 
 Before editing files in a new worktree, Claude states in the chat message that kicks off implementation that the following are in place (or explicitly asks Jeff to set them up):
 
-1. Worktree exists at `literate-emacs.d_<feature>/` (created via `git worktree add ../literate-emacs.d_<feature> -b <feature>`).
+1. Worktree exists at `literate-emacs.d.worktrees/<feature>/` (created via `git worktree add ../literate-emacs.d.worktrees/<feature> -b <feature>`).
 2. `~/.emacs.d/init.el` is repointed at the worktree's `init.el` (via `just link` from the worktree, if testing the change live).
 3. If the sub-goal adds new packages, `M-x package-refresh-contents` is expected before tangle.
 

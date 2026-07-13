@@ -33,7 +33,7 @@ Before reading the spec, run read-only sync checks against both repos. Jeff work
 ```sh
 cd /Users/jeff/jwm/proj/emacs-config && git fetch && git status -sb
 cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d && git fetch && git status -sb
-# plus any active feature worktree: git -C ../literate-emacs.d_<feature> status -sb
+# plus any active config worktree: git -C ../literate-emacs.d.worktrees/<feature> status -sb
 ```
 
 Report drift back to Jeff. If either repo is behind, recommend `git pull --ff-only` before proceeding. **Do not block** — Jeff decides whether to sync first or proceed against current state. The point is to surface drift, not to gate the workflow.
