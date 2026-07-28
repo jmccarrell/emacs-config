@@ -149,7 +149,7 @@ sibling container `../emacs-config.worktrees/`; the literate config uses the
 workspace-local container `../literate-emacs.d.worktrees/`.
 
 ```sh
-# from inside the repo, create a worktree + branch (Jeff-side, mutating):
+# from inside the repo, create a worktree + branch (Claude-runnable):
 cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d
 git worktree add ../literate-emacs.d.worktrees/<feature> -b <feature>
 # tear down when done (after killing its buffers — see below):
@@ -157,15 +157,13 @@ git worktree remove ../literate-emacs.d.worktrees/<feature>
 git worktree list   # inspect
 ```
 
-**Claude reads; Jeff acts on mutating git commands.** Claude inspects state with read-only git (`status`, `log`, `worktree list`, `diff`) and edits files, then hands Jeff the exact `git` commands for anything that mutates history, branches, worktrees, or remotes.
+**Git authority.** The boundary for all repos lives in `~/.claude/CLAUDE.md` (§ Git authority): Claude creates feature worktrees and branches, commits on them, pushes them, and manages issues/PRs itself; commits to main, merges into main, deleting unmerged branches (or any branch Claude didn't create), rewriting pushed history, force-pushes, and remote changes are handed to Jeff as exact commands. Main checkouts are read-only for Claude, file edits included — all work, code and docs, lands via feature worktree + PR. If the next required step is on the never-list and Jeff is unavailable: stop and ask; never work around it.
 
-### Sandbox path-translation
-
-Claude agents working on this project run in a sandbox that mounts `/Users/jeff/jwm/proj/emacs-config/` at a different absolute path (`/sessions/<session-id>/mnt/emacs-config/`). File tools (Read/Write/Edit) translate paths automatically. Only `git` commands are affected, and git run *in the sandbox* against a worktree can mislead: a worktree registered at the real `/Users/jeff/...` path may show as `prunable` or error ("fatal: not a git repository") simply because that path doesn't exist inside the sandbox. Treat sandbox git output about worktree paths with suspicion, and defer to the "Claude reads; Jeff acts" rule.
+Workspace-specific check for the allowed worktree removal: before `git worktree remove`, verify `readlink ~/.emacs.d/init.el` does not point into that worktree; if it does, repoint first (`just link` from the main checkout) so the symlink never dangles.
 
 ### `~/.emacs.d/init.el` symlink
 
-`~/.emacs.d/init.el` is a symlink. Its default target is `literate-emacs.d/init.el` (the repo's tangled output). To test a feature worktree's changes without merging, repoint the symlink at the feature worktree's `init.el`; a fresh Emacs then loads that `init.el` and picks up the worktree's config. `~/.emacs.d/` is outside the sandbox mount, so Claude cannot change the symlink directly — this is always a Jeff-side command.
+`~/.emacs.d/init.el` is a symlink. Its default target is `literate-emacs.d/init.el` (the repo's tangled output). To test a feature worktree's changes without merging, repoint the symlink at the feature worktree's `init.el`; a fresh Emacs then loads that `init.el` and picks up the worktree's config. Claude may run `just link` itself **with disclosure**: the same message states the new symlink target and the rollback command (`just link` from the previous checkout).
 
 The repo justfile has a `link` recipe that manages this symlink. Run it from whichever checkout you want live; it repoints `~/.emacs.d/init.el` there (imperative and idempotent, so it overwrites any prior symlink and creates `~/.emacs.d` on a cold start):
 
@@ -186,15 +184,17 @@ The worktree's `init.el` starts identical to the branch point — Jeff still nee
 
 For global Emacs files outside the worktree, Claude must distinguish provenance before acting: package-provided artifacts from packages Jeff intentionally uses are acceptable Emacs state, while Claude-authored files, ad hoc shell output, symlink changes, generated caches, package installs from arbitrary URLs, `package-vc`, Git checkouts, or unconfigured archives need explicit disclosure before execution. Disclosure means naming the path, provenance, purpose, teardown path, and replication implication.
 
+`just link` is a standing exception: Claude may run it without waiting for approval, provided the disclosure (target + rollback) is in the same message.
+
 Example: `M-x mcp-server-lib-install` may install `~/.emacs.d/emacs-mcp-stdio.sh`. That file is acceptable if it is the package-provided helper for `mcp-server-lib`; the important part is to make its provenance and lifecycle visible before invoking the command, so Jeff is not surprised by an unexplained global helper script. This matters for spikes: if the spike fails, the global state must be torn down; if it works, the global state must be replicated in Jeff's other environments. Claude may inspect these locations read-only when needed, but must not create, modify, remove, install, or regenerate non-routine global Emacs artifacts unless Jeff explicitly approves that specific write in chat. Prefer writing project-tracked source or documenting the Jeff-side command to run.
 
 ### Sub-goal pre-implementation checklist
 
-Before editing files in a new worktree, Claude states in the chat message that kicks off implementation that the following are in place (or explicitly asks Jeff to set them up):
+Before editing files for a new sub-goal, Claude — in the chat message that kicks off implementation:
 
-1. Worktree exists at `literate-emacs.d.worktrees/<feature>/` (created via `git worktree add ../literate-emacs.d.worktrees/<feature> -b <feature>`).
-2. `~/.emacs.d/init.el` is repointed at the worktree's `init.el` (via `just link` from the worktree, if testing the change live).
-3. If the sub-goal adds new packages, `M-x package-refresh-contents` is expected before tangle.
+1. Creates the worktree itself (`git worktree add ../literate-emacs.d.worktrees/<feature> -b <feature>`) and states that it did. The worktree is a hard gate: no implementation edits happen in the main checkout, ever. If worktree creation fails, stop and report — do not fall back.
+2. If the change should be testable live, runs `just link` from the worktree with disclosure (target + rollback); otherwise leaves the symlink alone and says so.
+3. If the sub-goal adds new packages, notes that `M-x package-refresh-contents` is expected before tangle.
 
 ### Tangling and verifying via justfile
 
@@ -216,7 +216,7 @@ emacs --batch -l org \
 
 Confirmed byte-identical to interactive `M-x org-babel-tangle`. Cold-run wall time is ~480ms on Apple Silicon.
 
-In TASK.md "Tangle steps" sections, Claude should suggest `just tangle` (shell-side, no Emacs context-switch) as the primary path, and `M-x org-babel-tangle` as the alternate. Claude itself cannot run these in the sandbox today (no `emacs` binary), but the recipes are the same on both sides.
+In TASK.md "Tangle steps" sections, Claude should suggest `just tangle` (shell-side, no Emacs context-switch) as the primary path, and `M-x org-babel-tangle` as the alternate. Claude runs these directly (native sessions have the `emacs` binary on PATH); the recipes are the same on both sides.
 
 ### Git workflow: org and init.el commit together
 
@@ -263,27 +263,7 @@ When writing verification steps inside a `TASK.md` (or in chat), Claude follows 
 
 ### Meta-doc edits (in the repo or in the workspace)
 
-Documentation-only files that do not get tangled into `init.el` may be edited directly (no separate worktree needed), because they don't risk breaking the live Emacs config. Examples:
-
-- `literate-emacs.d/emacs-2026-landscape.org` — backlog tracker (repo-level).
-- `literate-emacs.d/emacs-cheat-sheet.org` — when adding rows to existing sections that don't depend on a new `use-package` block (cheat-sheet edits *coupled* to a new config block still commit alongside that config change).
-- `/Users/jeff/jwm/proj/emacs-config/CLAUDE.md` — workspace-level meta-doc (this file).
-
-**Rule: every direct edit Claude makes to a tracked file must be accompanied in the same response by an explicit commit command** that Jeff can paste. Without the commit, the edit accumulates as silent uncommitted state, and merge conflicts later when worktrees touch the same file.
-
-For repo-level files (in `literate-emacs.d/`):
-
-```sh
-cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d && \
-  git add <file> && git commit -m "<short summary>"
-```
-
-For workspace-level files (this `CLAUDE.md`, etc.):
-
-```sh
-cd /Users/jeff/jwm/proj/emacs-config && \
-  git add <file> && git commit -m "<short summary>"
-```
+Documentation-only edits (landscape, cheat sheet, this `CLAUDE.md`, …) follow the same flow as config edits: feature worktree + PR. The old fast path — direct edits in the main checkout with a hand-pasted commit to `main` — is retired; main checkouts are read-only for Claude and nothing is committed to `main` directly. Small doc tweaks may batch onto a related open branch instead of getting their own worktree (cheat-sheet edits *coupled* to a new config block still commit alongside that config change, on that change's branch).
 
 ## Agent skills
 
