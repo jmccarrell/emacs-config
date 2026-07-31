@@ -26,7 +26,7 @@ emacs-config/
 
 ## literate-emacs.d — the active project
 
-`literate-emacs.d/` is a normal git repo (origin `git@github.com:jmccarrell/literate-emacs.d.git`), checked out on a branch (default `main`). Day-to-day work happens on `main` or a feature branch. For larger or parallel changes, Jeff uses a **git worktree** in the repository's `<repo>.worktrees/<feature>/` container: `literate-emacs.d.worktrees/<feature>/`. Worktrees are still part of the flow; the bare-root layout is not.
+`literate-emacs.d/` is a normal git repo (origin `git@github.com:jmccarrell/literate-emacs.d.git`), checked out on a branch (default `main`). Day-to-day work happens on `main` or a feature branch. For larger or parallel changes, Jeff uses a **worktree** (created with `wt`, see § Feature worktrees) in the repository's `<repo>.worktrees/<feature>/` container: `literate-emacs.d.worktrees/<feature>/`. Worktrees are still part of the flow; the bare-root layout is not.
 
 This convention applies to both repos in this workspace: workspace worktrees
 live beside this checkout in `../emacs-config.worktrees/<feature>/`, and
@@ -142,24 +142,49 @@ When working on a feature, a `TASK.md` file in the repo root (or a feature workt
 
 ## Feature worktrees (for Claude agents)
 
-For larger or parallel changes, Jeff uses a git worktree in the repository's
-`<repo>.worktrees/` container. The mechanics are plain git; the bare-root
-layout and the old `wt::*` recipes are gone. The workspace repo uses the
-sibling container `../emacs-config.worktrees/`; the literate config uses the
-workspace-local container `../literate-emacs.d.worktrees/`.
+For larger or parallel changes, Jeff uses a worktree in the repository's
+`<repo>.worktrees/` container; the bare-root layout is not used. The workspace
+repo uses the sibling container `../emacs-config.worktrees/`; the literate
+config uses the workspace-local container `../literate-emacs.d.worktrees/`.
+
+Worktree operations go through [worktrunk](https://worktrunk.dev) (`wt`) rather
+than raw `git worktree` — see `~/.claude/CLAUDE.md` § Worktrunk for the general
+convention and the raw-git fallback. (The retired `wt::*` **just recipes** are
+unrelated to the `wt` binary despite the name collision; nothing here defines
+`wt::*` today.)
 
 ```sh
 # from inside the repo, create a worktree + branch (Claude-runnable):
 cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d
-git worktree add ../literate-emacs.d.worktrees/<feature> -b <feature>
-# tear down when done (after killing its buffers — see below):
-git worktree remove ../literate-emacs.d.worktrees/<feature>
-git worktree list   # inspect
+wt switch --create <feature>
+# tear down when done (after killing its buffers, and after the symlink check below):
+wt remove <feature> --foreground
+wt list   # inspect
 ```
+
+The container path comes from the `worktree-path` template in
+`~/.config/worktrunk/config.toml`, so `wt switch --create <feature>` lands in
+`../literate-emacs.d.worktrees/<feature>` without the path being named. Prefer
+`--foreground` on removal in scripted or agent use: `wt remove` otherwise
+returns before removal has finished, and the symlink follow-up below depends on
+it being complete.
 
 **Git authority.** The boundary for all repos lives in `~/.claude/CLAUDE.md` (§ Git authority): Claude creates feature worktrees and branches, commits on them, pushes them, and manages issues/PRs itself; commits to main, merges into main, deleting unmerged branches (or any branch Claude didn't create), rewriting pushed history, force-pushes, and remote changes are handed to Jeff as exact commands. Main checkouts are read-only for Claude, file edits included — all work, code and docs, lands via feature worktree + PR. If the next required step is on the never-list and Jeff is unavailable: stop and ask; never work around it.
 
-Workspace-specific check for the allowed worktree removal: before `git worktree remove`, verify `readlink ~/.emacs.d/init.el` does not point into that worktree; if it does, repoint first (`just link` from the main checkout) so the symlink never dangles.
+Under worktrunk that boundary maps onto specific commands: `wt switch --create`, `wt list`, and plain `wt remove` are Claude-runnable — the last because it deletes a branch only when merged and hands back the `-D` command otherwise — while `wt remove -D` and `wt merge` are Jeff's.
+
+**Workspace-specific check before any worktree removal.** Verify `readlink ~/.emacs.d/init.el` does not point into the worktree being removed; if it does, repoint first (`just link` from the main checkout) so the symlink never dangles.
+
+```sh
+readlink ~/.emacs.d/init.el   # must not resolve into the worktree about to go
+```
+
+This check is **not** obviated by worktrunk. `wt remove` knows nothing about
+`~/.emacs.d/init.el`: it removes the worktree without warning and leaves the
+symlink dangling, which breaks the next Emacs start. Worktrunk's safety net
+covers branches, not external references into the worktree — so this step stays
+a manual precondition, and it now guards a single command that removes worktree
+and branch together rather than a two-step teardown.
 
 ### `~/.emacs.d/init.el` symlink
 
@@ -192,7 +217,7 @@ Example: `M-x mcp-server-lib-install` may install `~/.emacs.d/emacs-mcp-stdio.sh
 
 Before editing files for a new sub-goal, Claude — in the chat message that kicks off implementation:
 
-1. Creates the worktree itself (`git worktree add ../literate-emacs.d.worktrees/<feature> -b <feature>`) and states that it did. The worktree is a hard gate: no implementation edits happen in the main checkout, ever. If worktree creation fails, stop and report — do not fall back.
+1. Creates the worktree itself (`wt switch --create <feature>`, run from the literate-emacs.d checkout) and states that it did. The worktree is a hard gate: no implementation edits happen in the main checkout, ever. If worktree creation fails, stop and report — do not fall back.
 2. If the change should be testable live, runs `just link` from the worktree with disclosure (target + rollback); otherwise leaves the symlink alone and says so.
 3. If the sub-goal adds new packages, notes that `M-x package-refresh-contents` is expected before tangle.
 
