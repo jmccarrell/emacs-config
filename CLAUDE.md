@@ -26,7 +26,7 @@ emacs-config/
 
 ## literate-emacs.d — the active project
 
-`literate-emacs.d/` is a normal git repo (origin `git@github.com:jmccarrell/literate-emacs.d.git`), checked out on a branch (default `main`). Day-to-day work happens on `main` or a feature branch. For larger or parallel changes, Jeff uses a **worktree** (created with `wt`, see § Feature worktrees) in the repository's `<repo>.worktrees/<feature>/` container: `literate-emacs.d.worktrees/<feature>/`. Worktrees are still part of the flow; the bare-root layout is not.
+`literate-emacs.d/` is a normal git repo (origin `git@github.com:jmccarrell/literate-emacs.d.git`), checked out on a branch (default `main`). **Work happens in a worktree** (created with `wt`, see § Feature worktrees) in the repository's `<repo>.worktrees/<feature>/` container: `literate-emacs.d.worktrees/<feature>/`. The bare-root layout is not used.
 
 This convention applies to both repos in this workspace: workspace worktrees
 live beside this checkout in `../emacs-config.worktrees/<feature>/`, and
@@ -142,10 +142,20 @@ When working on a feature, a `TASK.md` file in the repo root (or a feature workt
 
 ## Feature worktrees (for Claude agents)
 
-For larger or parallel changes, Jeff uses a worktree in the repository's
-`<repo>.worktrees/` container; the bare-root layout is not used. The workspace
-repo uses the sibling container `../emacs-config.worktrees/`; the literate
-config uses the workspace-local container `../literate-emacs.d.worktrees/`.
+**A worktree is the default unit of work in both repos, not a heavyweight
+option reserved for large changes.** Anything that will produce a commit gets
+one: config changes, doc edits, spikes, single-line fixes. The exceptions are
+genuinely mechanical one-liners with nothing to review and no tangle step —
+adding a path to `.gitignore` is the canonical example. When in doubt, take the
+worktree; it costs one command and is removed by one more.
+
+For Claude the preference is absolute rather than a default: main checkouts are
+read-only, so *every* edit lands in a worktree, `.gitignore` included.
+
+Worktrees live in the repository's `<repo>.worktrees/` container; the bare-root
+layout is not used. The workspace repo uses the sibling container
+`../emacs-config.worktrees/`; the literate config uses the workspace-local
+container `../literate-emacs.d.worktrees/`.
 
 Worktree operations go through [worktrunk](https://worktrunk.dev) (`wt`) rather
 than raw `git worktree` — see `~/.claude/CLAUDE.md` § Worktrunk for the general
@@ -288,7 +298,7 @@ When writing verification steps inside a `TASK.md` (or in chat), Claude follows 
 
 ### Meta-doc edits (in the repo or in the workspace)
 
-Documentation-only edits (landscape, cheat sheet, this `CLAUDE.md`, …) follow the same flow as config edits: feature worktree + PR. The old fast path — direct edits in the main checkout with a hand-pasted commit to `main` — is retired; main checkouts are read-only for Claude and nothing is committed to `main` directly. Small doc tweaks may batch onto a related open branch instead of getting their own worktree (cheat-sheet edits *coupled* to a new config block still commit alongside that config change, on that change's branch).
+Documentation-only edits (landscape, cheat sheet, this `CLAUDE.md`, …) follow the same flow as config edits: feature worktree + PR. The old fast path — direct edits in the main checkout with a hand-pasted commit to `main` — is retired; main checkouts are read-only for Claude and nothing is committed to `main` directly. Small doc tweaks may batch onto a related open branch instead of getting their *own* worktree (cheat-sheet edits *coupled* to a new config block still commit alongside that config change, on that change's branch) — that is a choice of *which* worktree, never a licence to edit the main checkout.
 
 ## Agent skills
 
