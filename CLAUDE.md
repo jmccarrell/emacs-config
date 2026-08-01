@@ -159,9 +159,7 @@ container `../literate-emacs.d.worktrees/`.
 
 Worktree operations go through [worktrunk](https://worktrunk.dev) (`wt`) rather
 than raw `git worktree` — see `~/.claude/CLAUDE.md` § Worktrunk for the general
-convention and the raw-git fallback. (The retired `wt::*` **just recipes** are
-unrelated to the `wt` binary despite the name collision; nothing here defines
-`wt::*` today.)
+convention and the raw-git fallback.
 
 ```sh
 # from inside the repo, create a worktree + branch (Claude-runnable):
