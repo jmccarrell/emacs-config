@@ -21,6 +21,12 @@ resolves? NO — DANGLING
 No warning. The next Emacs start reads a dangling `init.el`. A `pre-remove` hook closes
 the gap: a non-zero exit aborts the removal.
 
+**PR #13 also raised the stakes.** It made a worktree the *default unit of work* rather
+than something reserved for larger or parallel changes — every commit-producing change
+gets one, and for Claude the preference is absolute. Worktrees are therefore created and
+removed far more often than when this check was written, and the check runs on removal.
+A guard worth having occasionally is now worth having on a routine path.
+
 ## Verified behavior
 
 Tested against worktrunk v0.70.0 in throwaway repos, with a project `.config/wt.toml`
@@ -73,6 +79,21 @@ Cost: `approvals.toml` is per-machine state that does not travel with the repo. 
 the existing per-machine list in `CLAUDE.md` § Multi-machine workflow, alongside the
 symlink target itself.
 
+**Consequence for the documented command.** PR #13 made `wt remove <feature> --foreground`
+canonical in § Feature worktrees. Combined with this decision, the *first* `wt remove` on
+any machine fails — not on the symlink, but on approval:
+
+```
+✗ Cannot prompt for approval in non-interactive environment
+↳ To skip prompts in CI/CD, add --yes; to pre-approve commands, run wt config approvals add
+```
+
+That is the design working, but it reads like a broken hook if undocumented. So the
+one-time `wt config approvals add` becomes an explicit **setup step** in § Multi-machine
+workflow, not something discovered by hitting the failure. Note the error advertises
+`--yes`; per this decision Claude does not take that route, and reports the missing
+approval to Jeff instead.
+
 ### 4. `--no-hooks` goes on Claude's never-list
 
 It bypasses the gate — verified above. This is the same rule as "if the next required step
@@ -103,6 +124,12 @@ Unresolved in the sketch, to settle during implementation:
   empty, the comparison passes, removal proceeds. Believed correct; confirm.
 - **Whether the message should name `just link`'s disclosure requirement**, or trust
   `CLAUDE.md` to carry it.
+- **`pre-switch` is deliberately *not* hooked.** `wt switch` between worktrees changes
+  which checkout you are standing in but leaves `~/.emacs.d/init.el` pointing wherever it
+  pointed — nothing dangles, so there is nothing to guard. The mismatch it can produce
+  (working in one worktree while another is live in Emacs) is real but intentional; Jeff
+  repoints with `just link` when he wants the live config to follow. Recording the
+  decision so it is not rediscovered as an omission.
 
 ## Verification plan
 
@@ -112,15 +139,32 @@ Unresolved in the sketch, to settle during implementation:
 3. Fresh clone, hook unapproved, non-interactive → removal fails with the approval error
    rather than running the hook.
 4. `wt config approvals add`, then repeat 1 and 2 → same outcomes without `-y`.
-5. Existing `rust-cargo-compile-command` worktree untouched throughout.
+5. Exactly the command § Feature worktrees documents — `wt remove <feature> --foreground`,
+   no `-y` — since that is what Claude will actually run.
+6. Existing `rust-cargo-compile-command` worktree untouched throughout.
 
 ## Doc updates this implies
 
-- `emacs-config/CLAUDE.md` § Feature worktrees — the symlink check becomes "the hook
-  enforces this; here is what its abort looks like," not "remember to check."
-- Same file § Multi-machine workflow — add `approvals.toml` to per-machine state.
+Targets below are named against `CLAUDE.md` **as merged in PR #13**, which rewrote this
+area after the first draft of this spec.
+
+- `emacs-config/CLAUDE.md` § Feature worktrees — the paragraph beginning "This check is
+  **not** obviated by worktrunk" is exactly what the hook inverts. It currently tells the
+  reader the tool cannot help and the check is manual; it becomes "the hook enforces this,"
+  followed by what the abort looks like and what to do about it. The `readlink` code block
+  above it stays — it is still how you check *before* running removal, and it is what Jeff
+  runs by hand when he is not going through `wt`.
+- Same file § Multi-machine workflow — add two entries to the per-machine list:
+  `approvals.toml`, and the one-time `wt config approvals add` setup step. The list already
+  leads with the `~/.emacs.d/init.el` symlink target, so the guard and the thing it guards
+  end up documented together.
+- Same file § Feature worktrees, the `wt remove <feature> --foreground` snippet — add a
+  comment that removal aborts if the symlink points into the worktree.
 - `~/.claude/CLAUDE.md` § Git authority — add `--no-hooks` to the never-list, since the
   reasoning is general rather than emacs-specific.
+- **No change to `skills/emacs-spec-decompose/SKILL.md`.** Its `~/.emacs.d/init.el` mention
+  covers repointing when a sub-goal *creates* a worktree; the skill has no removal
+  guidance, so the hook does not touch it. Stated here so review need not re-derive it.
 
 ## Out of scope
 
