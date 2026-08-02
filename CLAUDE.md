@@ -48,6 +48,21 @@ Sync each by fetching and pulling normally (`git pull --ff-only`, or a rebase wh
 Workspace-specific per-machine state (does not cross machines):
 
 - `~/.emacs.d/init.el` symlink target — points at `literate-emacs.d/init.el` by default; repoint per machine, and when creating or removing a feature worktree you want to test live.
+- Worktrunk hook approval (`approvals.toml`) — the `pre-remove` hook that guards
+  that symlink is a *project* command, and worktrunk requires approval before
+  running one. Approve once per machine, interactively, from the
+  `literate-emacs.d` checkout:
+
+  ```sh
+  wt config approvals add
+  ```
+
+  Until then `wt remove` fails with `✗ Cannot prompt for approval in
+  non-interactive environment`. The error advertises `--yes`; don't use it as
+  the fix. Skipping approval means any command in a tracked `.config/wt.toml`
+  runs unreviewed, including one that arrived via `git pull` — the approval
+  prompt *is* the review step. Re-approval is expected whenever the hook
+  changes, and Claude reports the missing approval rather than bypassing it.
 - `reference-emacs-configs/` cache — regenerate via `just ref-show-plan` from the workspace root.
 
 `TASK.md` is **branch-tracked** (committed alongside the work it describes; removed before the branch is merged so it never reaches `main`). It travels cross-machine via the branch.
@@ -165,7 +180,8 @@ convention and the raw-git fallback.
 # from inside the repo, create a worktree + branch (Claude-runnable):
 cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d
 wt switch --create <feature>
-# tear down when done (after killing its buffers, and after the symlink check below):
+# tear down when done (after killing its buffers); aborts if ~/.emacs.d/init.el
+# still points into the worktree — see the symlink check below:
 wt remove <feature> --foreground
 wt list   # inspect
 ```
@@ -187,12 +203,34 @@ Under worktrunk that boundary maps onto specific commands: `wt switch --create`,
 readlink ~/.emacs.d/init.el   # must not resolve into the worktree about to go
 ```
 
-This check is **not** obviated by worktrunk. `wt remove` knows nothing about
-`~/.emacs.d/init.el`: it removes the worktree without warning and leaves the
-symlink dangling, which breaks the next Emacs start. Worktrunk's safety net
-covers branches, not external references into the worktree — so this step stays
-a manual precondition, and it now guards a single command that removes worktree
-and branch together rather than a two-step teardown.
+**A `pre-remove` hook enforces this** — `literate-emacs.d/.config/wt.toml`, added
+per `specs/013-worktree-symlink-pre-remove-hook.md`. `wt remove` has no built-in
+knowledge of `~/.emacs.d/init.el`; the hook supplies it, and a non-zero exit
+aborts the removal with worktree *and* branch intact:
+
+```
+ABORT: ~/.emacs.d/init.el points into this worktree.
+  symlink -> …/literate-emacs.d.worktrees/<feature>/init.el
+Repoint it at the main checkout, then retry the removal:
+    cd /Users/jeff/jwm/proj/emacs-config/literate-emacs.d && just link
+```
+
+Do as it says and re-run; **never reach for `--no-hooks`**, which skips the hook
+and re-opens the hazard (it is on the never-list in `~/.claude/CLAUDE.md`).
+
+Two limits keep the `readlink` check above worth running rather than trusting the
+hook blindly:
+
+- **The hook lives in the repo, so it only guards worktrees whose branch carries
+  `.config/wt.toml`.** A branch created before it landed is unguarded. Verified
+  the hard way: a test worktree branched before the file was committed removed
+  silently despite the symlink pointing into it.
+- **It covers `literate-emacs.d` only.** Workspace (`emacs-config`) worktrees
+  hold no `init.el`, so they have no hook and need none.
+
+First `wt remove` on a machine fails with `✗ Cannot prompt for approval in
+non-interactive environment` — that is the approval gate, not a broken hook. See
+§ Multi-machine workflow.
 
 ### `~/.emacs.d/init.el` symlink
 
