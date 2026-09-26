@@ -123,7 +123,7 @@ because the projects I am starting will have me writing detailed PostgreSQL.
 **Blocked by a refresh of the reference configs.** Before any step here
 starts, every repo in `reference-emacs-configs/` is brought up to date and a
 summary of what changed since the last refresh (2026-04-26) is written. That
-refresh is separate work, not part of this spec. It blocks step 1 because the
+refresh is separate work, spec 016, not part of this spec. It blocks step 1 because the
 research must read current repos: mise is recent enough that older checkouts
 may predate any support for it.
 
