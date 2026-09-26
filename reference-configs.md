@@ -59,7 +59,6 @@ the inventory.
 | abougouffa-minemacs            | https://github.com/abougouffa/minemacs                | MEDIUM | local/cloud LLM stack; Ellama, gptel, Aidermacs, MCP |
 | matthewzmd-emacs.d             | https://github.com/MatthewZMD/.emacs.d                | MEDIUM | Aidermacs author config; OpenRouter model defaults |
 | manateelazycat-lazycat-emacs   | https://github.com/manateelazycat/lazycat-emacs       | MEDIUM | OpenRouter gptel, Aidermacs, Emigo, Whisper |
-| jkitchin-scimax                | https://github.com/jkitchin/scimax                    | MEDIUM | scientific Org, org-db, and RAG context |
 | oantolin-emacs-config          | https://github.com/oantolin/emacs-config              | MEDIUM | Embark / Orderless / Vertico author config; built-ins first; Groq gptel |
 | protesilaos-dotfiles           | https://github.com/protesilaos/dotfiles               | MEDIUM | literate config in modules; built-ins first; completion, Dired, Org, windows |
 
@@ -88,11 +87,11 @@ sync (for `andreyorst-dotfiles`, which had none, from 2026-04-26 by date); per-r
 | sacha-chua-dotemacs | 22 | 2026-05-28 → 2026-05-31 | bursts; quiet since June |
 | steve-purcell-dotemacs | 20 | 2026-06-18 → 2026-08-29 | active, small commits |
 | munen-emacs.d | 9 | 2026-05-21 → 2026-08-19 | moderate |
-| jkitchin-scimax | 2 | 2026-04-23 → 2026-04-28 | inactive (discontinued) |
+| jkitchin-scimax | 2 | 2026-04-23 → 2026-04-28 | inactive (discontinued); dropped 2026-09-26 |
 | abo-abo-dotemacs | 0 | last commit 2025-12-17 | quiet |
 | matthewzmd-emacs.d | 0 | last commit 2026-03-14 | quiet |
 | manateelazycat-lazycat-emacs | 0 | last commit 2026-02-23 | quiet |
-| danielmai-dotemacs | 0 | last commit 2023-02-15 | abandoned |
+| danielmai-dotemacs | 0 | last commit 2023-02-15 | abandoned; dropped 2026-09-26 |
 | oantolin-emacs-config | added this refresh | last commit 2026-09-18 | active |
 | protesilaos-dotfiles | added this refresh | last Emacs commit 2026-09-23 | very active |
 | andreyorst-dotfiles | 11 since 2026-04-26 | 2026-05-07 → 2026-09-04 | active (clone had been stale since 2021) |
@@ -173,8 +172,8 @@ contact configurable per project and added grammars.
   (661 commits). Its Emacs config is `.config/emacs/init.el`; since
   2026-04-26 the notable change is a move back to eglot (`279f6a10`). No mise,
   envrc, or AI packages (`git grep` over `.config/emacs`).
-- **danielmai-dotemacs** — no commits since 2023-02-15.
-- **jkitchin-scimax** — discontinued upstream.
+- **danielmai-dotemacs** — no commits since 2023-02-15. Dropped 2026-09-26.
+- **jkitchin-scimax** — discontinued upstream. Dropped 2026-09-26.
 - These clones in `reference-emacs-configs/` are not in the inventory, so the
   tooling does not track them: `ebzzry-dotfiles`, `editorconfig-emacs`,
   `greendog-gtd`, `howardabrams-dot-files`, `sirpscl-emacs.d`, `smartparens`.
@@ -192,10 +191,6 @@ Jeff's roadmap:
   ceiling; munen and yqrashawn cover custom tools / MCP; redguardtoo covers
   a compact gptel + macher setup; Sacha covers practical Org/language-learning use;
   MinEmacs, MatthewZMD, and Lazycat show package-stack and agent choices.
-- John Kitchin's scimax is worth tracking for scientific Org workflows,
-  org-db, and RAG-adjacent context, but not as current daily-driver AI config:
-  its public `scimax-gptel` work is not yet present, and the README says
-  scimax development was discontinued on 2026-04-23.
 - bbatsov is best for small, pragmatic quality-of-life upgrades and modern
   defaults that can land as tight cleanup commits.
 - abo-abo is now an active counter-signal rather than a dormant reference:
@@ -219,9 +214,9 @@ consulted during AI work:
 - `MatthewZMD/aidermacs` and `tninja/aider.el` — package-level truth for
   Aider-style pair programming from Emacs.
 - John Kitchin's RAG packages (`jkitchin/emacs-rag-libsql`,
-  `jkitchin/org-db-v3`) — secondary package context to read alongside
-  tracked `jkitchin-scimax` when an AI sub-goal reaches retrieval or
-  Org/DB-backed context.
+  `jkitchin/org-db-v3`) — secondary package context when an AI sub-goal
+  reaches retrieval or Org/DB-backed context. Kitchin has stopped using
+  Emacs, so check upstream activity first.
 - Mastering Emacs / Mickey Petersen — useful as blog and package context
   (e.g. Combobulate, ligatures, shell/editor workflow), but no current public
   personal Emacs config was found during this pass.
@@ -688,44 +683,6 @@ postgres` formatter (`.doom.d/lang.el:133-136`), `sqls` via nix.
 - Re-read alongside jwiegley before designing any serious tool-use or
   agent-shell sub-goal; use redguardtoo if the desired answer is smaller.
 
-### jkitchin-scimax
-
-John Kitchin's scimax starterkit for scientists and engineers. This is the
-right Kitchin repo to track; `jkitchin/jmax` exists, but last moved in 2018
-and is not a current config reference.
-
-Latest commit at the 2026-04-26 sync: `f1f12ac1 2026-04-23 Update README with scimax
-development status`.
-
-**2026-09-26 refresh** (`f1f12ac1..9cf9000`, 2 commits; latest
-`9cf9000 2026-04-28 Merge pull request #524…`): one outside fix to
-`scimax-ob.el` line numbers. Nothing relevant; upstream remains discontinued.
-
-**What we've extracted so far:**
-
-- 2026-04-26 Kitchin follow-up: track `jkitchin/scimax` as scientific
-  Org / org-db / RAG context, not as a top-tier current AI implementation.
-- `README.org` says the 2025 scimax 4.0 direction included LLM/gptel energy,
-  a non-public `scimax-gptel` package with tool and MCP integration for
-  scientific writing, and an org-db rewrite for semantic search.
-- `org-db-v2/` and `scimax.org` are concrete references for indexing Org
-  material into SQLite, full-text search, image/audio support, and agenda
-  workflows.
-
-**Likely future relevance:**
-
-- Re-read for scientific notebook patterns, Org database indexing, and
-  retrieval-shaped context before designing any RAG or research-note AI
-  workflow.
-- Keep `jkitchin/emacs-rag-libsql` and `jkitchin/org-db-v3` as package-level
-  secondary sources for newer retrieval experiments.
-
-**Caveat:**
-
-- The 2026-04-23 README says Kitchin no longer uses Emacs and is
-  discontinuing scimax development, so do not treat this as a current
-  daily-use AI config unless upstream activity resumes.
-
 ### oantolin-emacs-config
 
 Omar Antolín Camarena's personal config, added 2026-09-26 during spec 016
@@ -842,8 +799,15 @@ Current inventory-only notes:
 - `andreyorst-dotfiles`: tracked for continuity. GitLab / web search did not
   surface a strong AI/LLM config signal during the 2026-04-26 AI reference
   expansion, so it remains inventory-only.
-- `danielmai-dotemacs`: historically useful to Jeff's original config, but
-  currently lower signal than Purcell/bbatsov for modern migrations.
+
+### Dropped repos
+
+Removed from the inventory; their notes live in git history.
+
+- `danielmai-dotemacs` (2026-09-26): no commits since 2023-02-15. It shaped
+  Jeff's original config, which still credits it.
+- `jkitchin-scimax` (2026-09-26): Kitchin discontinued scimax development on
+  2026-04-23 and no longer uses Emacs.
 
 ## Updating this file
 

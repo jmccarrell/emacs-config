@@ -1,7 +1,6 @@
 abo-abo-dotemacs https://github.com/abo-abo/oremacs.git b17e90e0729e4fefc45f00b9e087651401a05453
 andreyorst-dotfiles git@gitlab.com:andreyorst/dotfiles.git 5ccdbe0ca2fae3012f26d2dbf4c23caf1e16b9e7
 bbatsov-dotemacs https://github.com/bbatsov/emacs.d.git 01286d8abab2de642e465e725c9035713ad79be0
-danielmai-dotemacs https://github.com/danielmai/.emacs.d.git e2ddab43e1ada5dbef6e47b4f37b1d96b9a0733a
 jwiegley-dotemacs https://github.com/jwiegley/dot-emacs.git 9a512ede6ccd6feb3a82090698ed394ea0ca8921
 munen-emacs.d https://github.com/munen/emacs.d.git c7be64d222c3030c3ddd82e189110ee7db05dd11
 sacha-chua-dotemacs https://github.com/sachac/.emacs.d.git 57c7f7b30dcf5930daea4edbe6dfc7e2eafea4a5
@@ -11,6 +10,5 @@ abougouffa-minemacs https://github.com/abougouffa/minemacs.git 43dfa2118f231ba51
 matthewzmd-emacs.d https://github.com/MatthewZMD/.emacs.d.git e8a999bb8532135645786a193b9be7739197692a
 manateelazycat-lazycat-emacs https://github.com/manateelazycat/lazycat-emacs.git 200684c3ec7d40bf7415b1d647da35f00c412b0f
 yqrashawn-yqdotfiles https://github.com/yqrashawn/yqdotfiles.git db35cd8f7b03e08b0b9240389421e428c17ff2b5
-jkitchin-scimax https://github.com/jkitchin/scimax.git 9cf900078cad6b46aa7882b593880685a361bdeb
 oantolin-emacs-config https://github.com/oantolin/emacs-config.git f11d43678c742b8c6cbaafe8a122e107439ed47e
 protesilaos-dotfiles https://github.com/protesilaos/dotfiles.git cd4608b17be274dc2a424ae52ed0c5a93e1ce7e0
