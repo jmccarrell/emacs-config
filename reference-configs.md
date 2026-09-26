@@ -221,24 +221,21 @@ has no default entry for any SQL server (verified).
   and columns from the live database.
 - `sqls` was rejected: it has no syntax diagnostics, uses its own parser, has
   no Homebrew formula, and calls itself unstable.
-- **Credentials: set a password-less `DATABASE_URL` in the project.** With
-  separate `PG*` variables the server builds its connection with a password
-  that defaults to `"postgres"`, so `.pgpass` is never consulted (verified:
-  `pgls_workspace/src/settings.rs:758`,
-  `workspace/server/connection_manager.rs` builds `PgConnectOptions::new()
-  ...password(...)`). A connection URL is parsed by sqlx, which applies
-  `PGPASSFILE` when the URL has no password (sqlx 0.8.6
-  `sqlx-postgres/src/options/parse.rs`; read, not run). So the project's
+- **Credentials: set a password-less `DATABASE_URL` in the project.** Given
+  separate `PG*` variables, the server uses the password `"postgres"` unless
+  `PGPASSWORD` is set, and never reads `.pgpass`. Given a connection URL with
+  no password, it reads the password from `PGPASSFILE`. So the project's
   `mise.toml` gains a `DATABASE_URL` naming the user, host and database, and
-  the password stays in `.pgpass`.
+  the password stays in `.pgpass`. Found by reading the server's source; spec
+  015 step 6 proves it.
 - Costs:
   - Every project shares one server process, which reads the environment of
-    whichever project started it (`pgls_cli/src/service/unix.rs:24`; read, not
-    run). Harmless while `artofpg` is the only database.
+    whichever project started it. Harmless while `artofpg` is the only
+    database.
   - Type checking covers only SELECT, INSERT, UPDATE, DELETE and CTEs.
   - A blank line inside a statement is treated as the end of the statement.
   - Its formatter is marked "Preview"; not used (see below).
-- Which login the server uses (`artofpg_ddl` or `artofpg_dml`) is left to
+- Which login the server uses (`artofpg_ddl` or `artofpg_rw`) is left to
   spec 015 step 6.
 
 ### Formatter: `pg_format` through `reformatter`
