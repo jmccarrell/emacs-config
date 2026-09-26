@@ -112,7 +112,9 @@ Answered by step 1 (literate-emacs.d #40). The reasoning and sources are in
    *Check:* completion offers a column of an `artofpg` table; a misspelled
    keyword is marked before the statement runs.
 7. **Formatting.** One command formats a query, using the formatter chosen in
-   step 1.
+   step 1 (`pg_format`). Deferred until after step 6. Install it by adding
+   `brew "pgformatter"` to `Brewfile.jwm` in `jwm-bin`, as step 6 does for
+   `postgres-language-server`.
    *Check:* formatting a badly indented query gives the expected layout, and
    formatting it a second time changes nothing.
 8. **Documentation.** Update the prose in `jeff-emacs-config.org` and
