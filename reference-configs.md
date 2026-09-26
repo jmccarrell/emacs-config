@@ -61,6 +61,7 @@ the inventory.
 | manateelazycat-lazycat-emacs   | https://github.com/manateelazycat/lazycat-emacs       | MEDIUM | OpenRouter gptel, Aidermacs, Emigo, Whisper |
 | jkitchin-scimax                | https://github.com/jkitchin/scimax                    | MEDIUM | scientific Org, org-db, and RAG context |
 | oantolin-emacs-config          | https://github.com/oantolin/emacs-config              | MEDIUM | Embark / Orderless / Vertico author config; built-ins first; Groq gptel |
+| protesilaos-dotfiles           | https://github.com/protesilaos/dotfiles               | MEDIUM | literate config in modules; built-ins first; completion, Dired, Org, windows |
 
 Tier definitions:
 
@@ -93,6 +94,7 @@ sync (for `andreyorst-dotfiles`, which had none, from 2026-04-26 by date); per-r
 | manateelazycat-lazycat-emacs | 0 | last commit 2026-02-23 | quiet |
 | danielmai-dotemacs | 0 | last commit 2023-02-15 | abandoned |
 | oantolin-emacs-config | added this refresh | last commit 2026-09-18 | active |
+| protesilaos-dotfiles | added this refresh | last Emacs commit 2026-09-23 | very active |
 | andreyorst-dotfiles | 11 since 2026-04-26 | 2026-05-07 → 2026-09-04 | active (clone had been stale since 2021) |
 
 ### SQL and PostgreSQL
@@ -489,8 +491,8 @@ and streaming churn. gptel and agent-shell setup unchanged; SQLite only.
 **Notable recent activity (as of 2026-04-25 sync):**
 
 - `more stuff from prot and bbatsov` (explicit cross-pollination
-  signal — confirms Sacha tracks Prot and bbatsov's configs, same as we
-  do). She's a good "what's filtering down to working users?" indicator.
+  signal — confirms Sacha tracks Prot and bbatsov's configs; we track
+  both as of 2026-09-26). She's a good "what's filtering down to working users?" indicator.
 - Whisperx (small model) for live transcription — relevant if we ever
   explore audio-input sub-goals.
 - `gptel` backend matrix includes Groq, Gemini, paid Gemini, and Mistral
@@ -754,6 +756,39 @@ jinx-occur`. History from 2020-04; active through 2026.
 - Not a source for SQL, mise/direnv or eglot: `git grep -i -w` over its
   `.el` files finds no `sql`, `postgres`, `mise`, `envrc`, `direnv`,
   `exec-path` or `eglot`.
+
+### protesilaos-dotfiles
+
+Protesilaos Stavrou's (Prot's) dotfiles, managed with GNU Stow; the Emacs
+config is under `emacs/.emacs.d/`. Added 2026-09-26 during spec 016 after
+Sacha's notes showed her tracking it. Prot writes `modus-themes`,
+`ef-themes`, `denote` and many other packages.
+
+Latest commit at the 2026-09-26 sync: `cd4608b1 2026-09-23 emacs: make
+prot-icons-tab-bar-name reuse tab-bar-current face for consistency`. History
+from 2019-02; 245 commits under `emacs/` since 2026-01-01.
+
+The config is literate, like Jeff's: `prot-emacs.org` is the prose source,
+tangled into `init.el`, `early-init.el`, topic modules in
+`prot-emacs-modules/` (completion, dired, git, langs, org, search, window, …)
+and small libraries in `prot-lisp/`. The org file warns readers not to
+copy-paste without understanding.
+
+**What we've extracted so far:**
+
+- Nothing yet.
+
+**Likely future relevance:**
+
+- A second literate config to compare against Jeff's own structure: how prose,
+  modules and a personal library split across files.
+- Built-in-first setups for completion (vertico, orderless, embark,
+  marginalia via `prot-lisp/`), Dired, Org, windows and search.
+- eglot basics in `prot-emacs-modules/prot-emacs-langs.el:80-83`
+  (`eglot-sync-connect nil`, `eglot-autoshutdown t`).
+- Not a source for SQL, mise/direnv or AI: `grep -r -i -w` over its `.el`
+  files finds no `sql`, `postgres`, `mise`, `envrc`, `direnv`, `exec-path`,
+  `gptel`, `llm` or `claude`.
 
 ## Workflow
 
