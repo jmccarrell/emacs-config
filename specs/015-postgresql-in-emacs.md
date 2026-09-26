@@ -59,16 +59,17 @@ because the projects I am starting will have me writing detailed PostgreSQL.
 
 ## Open questions
 
-<!-- Things to answer or research before the plan is fixed. -->
-- Which language server: `postgres-language-server` vs `sqls` vs none?
-- Formatter: `pg_format` vs `sqlfluff` vs none?
-- Tree-sitter mode vs classic `sql-mode`?
-- How does Emacs get a project's connection settings? The art-of-postgresql repo
-  sets them in `mise.toml`, but Emacs loads per-project settings only from
-  direnv's `.envrc` (the `envrc` package), so a buffer there sees neither the
-  `PG*` variables nor `psql` (Homebrew's keg-only `libpq`). Preferred answer:
-  Emacs uses mise directly. If no workable way exists, name the fallback and
-  what it costs.
+Answered by step 1 (literate-emacs.d #40). The reasoning and sources are in
+`reference-configs.md`, section "SQL and PostgreSQL decisions (spec 015)".
+
+- Language server: `postgres-language-server`, through eglot. The project
+  needs a `DATABASE_URL` without a password, so the server reads `.pgpass`.
+- Formatter: `pg_format`, through `reformatter`.
+- Editing mode: classic `sql-mode`; Emacs has no built-in SQL tree-sitter mode.
+- Project settings: the `mise.el` package, so Emacs reads `mise.toml` directly.
+  Before enabling it: turn off its automatic `mise trust --all`, set mise's
+  `experimental` setting in the dotfiles repo (otherwise the package writes it
+  there itself), and order it with `envrc`.
 
 ## Steps
 
