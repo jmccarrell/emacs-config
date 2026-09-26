@@ -323,10 +323,13 @@ Rejected:
 
 `ob-sql`:
 
-- **Default header arguments `:engine postgresql` and `:cmdline -X`.** Without
+- **Default header arguments `:engine postgres` and `:cmdline -X`.** Without
   `-X`, `psql` reads `~/.psqlrc`, whose output would corrupt the result table
   (`ob-sql.el:289-305`, verified). The engine default follows abo-abo's
-  template (`modes/ora-org.el:394`).
+  template (`modes/ora-org.el:394`), except for the name: `ob-sql` runs
+  blocks under `postgres` or `postgresql`, but `C-c '` hands the engine to
+  `sql-set-product` (`ob-sql.el:111-116`), which knows only `postgres`.
+  `postgresql` broke `C-c '` until literate-emacs.d #53.
 - **No connection header arguments.** With none of `:dbhost`, `:dbport`,
   `:dbuser` or `:database`, `psql` gets no connection flags and uses the `PG*`
   variables (`ob-sql.el:130-140`). Never use `:dbpassword`: it puts the
