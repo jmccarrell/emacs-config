@@ -123,7 +123,14 @@ predating the range:
   configuration.
 - **andreyorst-dotfiles** — `ob-sql`, `sql-indent`, and `sql-clickhouse`
   (`.config/emacs/init.el:950,1352-1358`); no PostgreSQL specifics.
+- **abo-abo-dotemacs** — an org structure template that inserts
+  `#+begin_src sql :engine postgresql` (`modes/ora-org.el:394`).
+- **jwiegley-dotemacs** also loads `pgmacs`, a table browser built on the
+  pure-elisp `pg` client (`init.org:5732-5736`).
 - Sacha and scimax use SQLite only; bbatsov and redguardtoo have no SQL setup.
+
+The practices chosen from these are in
+[SQL and PostgreSQL decisions](#sql-and-postgresql-decisions-spec-015).
 
 ### Per-project environment (mise, direnv)
 
@@ -179,6 +186,164 @@ contact configurable per project and added grammars.
   tooling does not track them: `ebzzry-dotfiles`, `editorconfig-emacs`,
   `greendog-gtd`, `howardabrams-dot-files`, `sirpscl-emacs.d`, `smartparens`.
   They were left as they are.
+
+## SQL and PostgreSQL decisions (spec 015)
+
+Research for spec 015 step 1 (literate-emacs.d #40), 2026-09-26. Sources are
+Emacs 31.1's bundled `sql.el`, `ob-sql.el` and `ob-eval.el`, the installed
+`envrc` package, each tool's own repo and documentation, and the reference
+repos above. "Verified" means the command was run or the source line was
+read; anything else is marked.
+
+### Editing mode: classic `sql-mode`
+
+Keep the built-in `sql-mode` with `sql-product` set to `postgres` (done in
+literate-emacs.d #38). No tree-sitter mode.
+
+- Emacs 31.1 ships no `sql-ts-mode`, and Emacs master has none either
+  (verified: `(locate-library "sql-ts-mode")` is nil).
+- The third-party `sql-ts-mode` repos are small, unmaintained, and not on
+  MELPA. The grammar, DerekStride/tree-sitter-sql, describes itself as
+  permissive rather than PostgreSQL-exact, and its generated parser lives on
+  the `gh-pages` branch.
+- `sql-mode` derives from `prog-mode` (`sql.el:4151`), so the existing flymake,
+  eglot and envrc hooks already apply.
+- `sql-indent` (GNU ELPA) is already turned on by `sql.el` when installed
+  (`sql-use-indent-support`). Add it only if indentation proves a problem.
+
+### Language server: `postgres-language-server`
+
+Use `postgres-language-server` from Homebrew (0.25.7, maintained), through
+eglot with `(sql-mode . ("postgres-language-server" "lsp-proxy"))`. Emacs 31.1
+has no default entry for any SQL server (verified).
+
+- It is the only candidate that gives both syntax errors while typing (it
+  parses with libpg_query, PostgreSQL's own parser) and completion of tables
+  and columns from the live database.
+- `sqls` was rejected: it has no syntax diagnostics, uses its own parser, has
+  no Homebrew formula, and calls itself unstable.
+- **Credentials: set a password-less `DATABASE_URL` in the project.** With
+  separate `PG*` variables the server builds its connection with a password
+  that defaults to `"postgres"`, so `.pgpass` is never consulted (verified:
+  `pgls_workspace/src/settings.rs:758`,
+  `workspace/server/connection_manager.rs` builds `PgConnectOptions::new()
+  ...password(...)`). A connection URL is parsed by sqlx, which applies
+  `PGPASSFILE` when the URL has no password (sqlx 0.8.6
+  `sqlx-postgres/src/options/parse.rs`; read, not run). So the project's
+  `mise.toml` gains a `DATABASE_URL` naming the user, host and database, and
+  the password stays in `.pgpass`.
+- Costs:
+  - Every project shares one server process, which reads the environment of
+    whichever project started it (`pgls_cli/src/service/unix.rs:24`; read, not
+    run). Harmless while `artofpg` is the only database.
+  - Type checking covers only SELECT, INSERT, UPDATE, DELETE and CTEs.
+  - A blank line inside a statement is treated as the end of the statement.
+  - Its formatter is marked "Preview"; not used (see below).
+- Which login the server uses (`artofpg_ddl` or `artofpg_dml`) is left to
+  spec 015 step 6.
+
+### Formatter: `pg_format` through `reformatter`
+
+Use `pg_format` (Homebrew `pgformatter`, 5.11, maintained) with a local
+`reformatter-define`, the way the config already formats Go and Python.
+
+- `sqlfluff` was rejected: it is a linter first, slower, needs a dialect
+  file, and fails on anything it cannot parse. yqrashawn uses it
+  (`.doom.d/lang.el:133-136`).
+- Purcell's `sqlformat` package is only a `reformatter-define` around the same
+  command, so it adds a dependency for nothing.
+- The language server's formatter is in preview; revisit when it is not.
+
+### Project settings: `mise.el`
+
+Use `mise.el` (MELPA package `mise`, https://github.com/eki3z/mise.el). No
+reference repo configures mise, and mise's own documentation lists `mise.el`
+as the Emacs integration (`docs/ide-integration.md`). It works the way
+`envrc` does: per buffer it runs `mise env --json` and sets a buffer-local
+`process-environment` and `exec-path`, and it wraps `org-babel-eval` so
+org source blocks inherit them (`mise.el:83`).
+
+Verified with mise 2026.9.14: `mise env --json` in the art-of-postgresql repo
+gives `PATH` starting with `/opt/homebrew/opt/libpq/bin` and an absolute
+`PGPASSFILE`; in `$HOME` it gives no `PG*` variables; on an untrusted
+`mise.toml` it refuses.
+
+It needs these settings before it is safe here (all read in `mise.el` at
+849c44b):
+
+- **`mise-trust nil`.** The default asks once, then runs `mise trust --all`,
+  which trusts every config in the directory and its parents.
+- **The `experimental` setting.** When mise's `experimental` setting is not
+  true, the package runs `mise settings set experimental true`, which writes
+  to the global mise config. On this machine the setting is false and the
+  global config is `jwm-dotfiles-2024/home/.config/mise/config.toml`, so the
+  package would edit a dotfiles file without review. Set it in the dotfiles
+  repo deliberately before enabling the package.
+- **Running alongside `envrc`.** Each package clears the other's buffer-local
+  environment. Turn on `global-mise-mode` before `envrc-global-mode`, and
+  exclude buffers where envrc is active (the workaround in mise.el issue
+  #22). Inferred from source, not tested.
+- **Speed.** It runs several blocking `mise` processes for each new buffer
+  (issues #23, #24). Measure the effect when opening files in spec 015 step 3.
+
+The package is quiet (last commit 2025-12-29), but it is small and the
+behavior above was read from its source.
+
+Rejected:
+
+- `.envrc` with `use mise`, under the existing `envrc`: mise marks it
+  deprecated and unsupported (`docs/direnv.md`), and it needs a second file
+  and a second approval (`direnv allow`) in each project.
+- `.dir-locals.el`, as munen does for PostgreSQL login settings
+  (`custom-settings.el:254-265`): repeats every setting, needs `eval`, and
+  does not reach temporary or SQL session buffers.
+- mise shims on the global PATH: `[env]` variables are set only when a shim
+  runs, and `psql` is not a mise tool.
+
+### Practices to adopt
+
+`sql.el`:
+
+- **`sql-postgres-login-params` set to nil.** The default prompts for user
+  and database with `jeff` as the default, and passing those overrides
+  `PGDATABASE` (`sql.el:1204-1213, 5398-5416`, verified). With nil, psql
+  takes everything from the `PG*` variables and `.pgpass`.
+- **`--no-psqlrc` added to `sql-postgres-options`**, so a custom prompt in
+  `~/.psqlrc` cannot break the session's prompt matching. From Purcell,
+  `lisp/init-sql.el:5-7`.
+- **`C-c C-z` to jump to the SQL session buffer.** Purcell,
+  `lisp/init-sql.el:9-21`.
+- **Persistent session history** through `sql-input-ring-file-name`. Purcell,
+  `lisp/init-sql.el:31-32`.
+- **Full highlighting in the session buffer.** Purcell,
+  `lisp/init-sql.el:35-38`.
+- **EXPLAIN as JSON** (optional). Purcell, `lisp/init-sql.el:47-102`, changed
+  so that empty `sql-database`, `sql-server` and `sql-user` do not override
+  the `PG*` variables (lines 73-77 set them unconditionally).
+- The SQL session buffer should get the project environment from its own
+  directory, since `global-mise-mode` turns on in it before `psql` starts
+  (`sql.el:4724-4739`, `comint.el:829-832`; read, not run). Spec 015 step 4
+  proves this; if it fails, wrap `sql-comint` with `inheritenv-add-advice`.
+
+`ob-sql`:
+
+- **Default header arguments `:engine postgresql` and `:cmdline -X`.** Without
+  `-X`, `psql` reads `~/.psqlrc`, whose output would corrupt the result table
+  (`ob-sql.el:289-305`, verified). The engine default follows abo-abo's
+  template (`modes/ora-org.el:394`).
+- **No connection header arguments.** With none of `:dbhost`, `:dbport`,
+  `:dbuser` or `:database`, `psql` gets no connection flags and uses the `PG*`
+  variables (`ob-sql.el:130-140`). Never use `:dbpassword`: it puts the
+  password on the command line (`ob-sql.el:293-296`).
+- Any output on stderr, including PostgreSQL notices, opens the babel error
+  buffer even when the query succeeds (`ob-eval.el:74-78`). Expect this in
+  spec 015 step 5.
+
+Skipped: `ejc-sql` (a JVM client with its own connection settings, from
+yqrashawn), `flymake-sqlfluff` and `sqlup-mode` (minemacs; the language
+server covers diagnostics), `pgmacs` (jwiegley; not needed yet), and
+jwiegley's `org-mssql` connection pattern (Microsoft SQL Server only, and it
+puts the password on the command line).
 
 ## Current Landscape-Level Signals
 
