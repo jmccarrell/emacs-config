@@ -35,7 +35,7 @@ because the projects I am starting will have me writing detailed PostgreSQL.
 <!-- Which servers, how they are reached, and where their credentials come from. -->
 | Target | How it is reached | Credentials source |
 |--------|-------------------|--------------------|
-| `artofpg` on folio (logins `artofpg_ddl`, `artofpg_dml`) | from lyra only; `PGHOST`/`PGDATABASE`/`PGSSLMODE` set by the art-of-postgresql repo's `mise.toml` | that checkout's gitignored `.pgpass`, written by `just write-pgpass`, found through `PGPASSFILE` |
+| `artofpg` on folio (logins `artofpg_ddl`, `artofpg_rw`) | from lyra only; `PGHOST`/`PGDATABASE`/`PGSSLMODE` set by the art-of-postgresql repo's `mise.toml` | that checkout's gitignored `.pgpass`, written by `just write-pgpass`, found through `PGPASSFILE` |
 
 ## Constraints
 
@@ -99,7 +99,7 @@ Answered by step 1 (literate-emacs.d #40). The reasoning and sources are in
 4. **Interactive session.** Start a PostgreSQL session from a `.sql` buffer
    and send a statement, a region, or the whole buffer to it.
    *Check:* `select current_user;` sent from a `.sql` buffer returns the
-   login chosen for the session (`artofpg_ddl` or `artofpg_dml`), and no
+   login chosen for the session (`artofpg_ddl` or `artofpg_rw`), and no
    password prompt appears.
 5. **SQL in org documents.** Org source blocks run against `artofpg` and show
    their results in the document. Revisit the current setting that runs SQL
