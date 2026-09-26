@@ -72,8 +72,8 @@ Tier definitions:
 ## 2026-09-26 refresh
 
 Spec 016. Every repo in `reference-repos.list` was fast-forwarded to its
-upstream except `andreyorst-dotfiles` (see below). Ranges run from the SHA the
-inventory recorded at the 2026-04-26 sync; per-repo detail is in each repo's
+upstream. Ranges run from the SHA the inventory recorded at the 2026-04-26
+sync (for `andreyorst-dotfiles`, which had none, from 2026-04-26 by date); per-repo detail is in each repo's
 "2026-09-26 refresh" block under [Per-repo notes](#per-repo-notes).
 
 | repo | commits | span | activity |
@@ -91,7 +91,7 @@ inventory recorded at the 2026-04-26 sync; per-repo detail is in each repo's
 | matthewzmd-emacs.d | 0 | last commit 2026-03-14 | quiet |
 | manateelazycat-lazycat-emacs | 0 | last commit 2026-02-23 | quiet |
 | danielmai-dotemacs | 0 | last commit 2023-02-15 | abandoned |
-| andreyorst-dotfiles | not refreshed | local clone last commit 2021-10-22 | see below |
+| andreyorst-dotfiles | 11 since 2026-04-26 | 2026-05-07 → 2026-09-04 | active (clone had been stale since 2021) |
 
 ### SQL and PostgreSQL
 
@@ -117,6 +117,8 @@ predating the range:
 - **abougouffa-minemacs** — only lists `sqlformat`, `pg_format` and `sqlint`
   in its external-tools catalogue (`core/me-external-tools.el`); no SQL
   configuration.
+- **andreyorst-dotfiles** — `ob-sql`, `sql-indent`, and `sql-clickhouse`
+  (`.config/emacs/init.el:950,1352-1358`); no PostgreSQL specifics.
 - Sacha and scimax use SQLite only; bbatsov and redguardtoo have no SQL setup.
 
 ### Per-project environment (mise, direnv)
@@ -155,12 +157,15 @@ bbatsov rebuilt around eglot plus built-in ts-modes, with guarded
 eglot bridge. Purcell disabled eglot semantic tokens. minemacs made the eglot
 contact configurable per project and added grammars.
 
-### Not refreshed, and candidates to drop
+### Repair, and candidates to drop
 
-- **andreyorst-dotfiles** — the local clone's `origin` points at
+- **andreyorst-dotfiles** — the local clone's `origin` pointed at
   `https://github.com/andreyorst/dotfiles.git`, which now asks for
-  credentials; the inventory URL (`git@gitlab.com:andreyorst/dotfiles.git`)
-  answers. Fixing it means repointing the clone's remote.
+  credentials, so the clone had not advanced since 2021-10-22. It was
+  repointed to `https://gitlab.com/andreyorst/dotfiles.git` and pulled
+  (661 commits). Its Emacs config is `.config/emacs/init.el`; since
+  2026-04-26 the notable change is a move back to eglot (`279f6a10`). No mise,
+  envrc, or AI packages (`git grep` over `.config/emacs`).
 - **danielmai-dotemacs** — no commits since 2023-02-15.
 - **jkitchin-scimax** — discontinued upstream.
 - These clones in `reference-emacs-configs/` are not in the inventory, so the
