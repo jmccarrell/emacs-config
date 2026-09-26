@@ -115,9 +115,11 @@ Answered by step 1 (literate-emacs.d #40). The reasoning and sources are in
    step 1.
    *Check:* formatting a badly indented query gives the expected layout, and
    formatting it a second time changes nothing.
-8. **Documentation.** Update the prose in `jeff-emacs-config.org`, the SQL
-   section of `emacs-cheat-sheet.org`, and `emacs-2026-landscape.org`.
-   *Check:* each new key binding and command appears in the cheat sheet.
+8. **Documentation.** Update the prose in `jeff-emacs-config.org` and
+   `emacs-2026-landscape.org`. The cheat sheet is not left to this step: see
+   Execution.
+   *Check:* the cheat sheet's SQL section covers every step, and the landscape
+   document records the SQL setup.
 
 ## Execution
 
@@ -133,6 +135,13 @@ driven by the repo's agent issue workflow (`docs/workflow/agent-workflow.md`):
 each issue carries an execution spec in its body and waits at `agent:ready` for my
 approval before any code is written.
 
-Update the existing docs as part of the work: the SQL setup in
-`jeff-emacs-config.org`, the SQL section of `emacs-cheat-sheet.org`, and
-`emacs-2026-landscape.org`.
+**Every step documents its own use in the cheat sheet.** How to use what a
+step builds (commands, key bindings, one-time setup) goes in the "SQL and
+PostgreSQL" section of `emacs-cheat-sheet.org` in the same PR as the step, so
+the cheat sheet never lags the config. Each step's issue lists the cheat sheet
+under affected paths, and its acceptance criteria include that every new
+binding and command appears there. Steps 2-4 were documented after the fact,
+in literate-emacs.d #45.
+
+Update the other docs as part of the work: the SQL setup in
+`jeff-emacs-config.org` and `emacs-2026-landscape.org`.
