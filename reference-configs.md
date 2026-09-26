@@ -60,6 +60,7 @@ the inventory.
 | matthewzmd-emacs.d             | https://github.com/MatthewZMD/.emacs.d                | MEDIUM | Aidermacs author config; OpenRouter model defaults |
 | manateelazycat-lazycat-emacs   | https://github.com/manateelazycat/lazycat-emacs       | MEDIUM | OpenRouter gptel, Aidermacs, Emigo, Whisper |
 | jkitchin-scimax                | https://github.com/jkitchin/scimax                    | MEDIUM | scientific Org, org-db, and RAG context |
+| oantolin-emacs-config          | https://github.com/oantolin/emacs-config              | MEDIUM | Embark / Orderless / Vertico author config; built-ins first; Groq gptel |
 
 Tier definitions:
 
@@ -91,6 +92,7 @@ sync (for `andreyorst-dotfiles`, which had none, from 2026-04-26 by date); per-r
 | matthewzmd-emacs.d | 0 | last commit 2026-03-14 | quiet |
 | manateelazycat-lazycat-emacs | 0 | last commit 2026-02-23 | quiet |
 | danielmai-dotemacs | 0 | last commit 2023-02-15 | abandoned |
+| oantolin-emacs-config | added this refresh | last commit 2026-09-18 | active |
 | andreyorst-dotfiles | 11 since 2026-04-26 | 2026-05-07 → 2026-09-04 | active (clone had been stale since 2021) |
 
 ### SQL and PostgreSQL
@@ -148,6 +150,9 @@ is left to spec 015's research step.
   `agent-shell` (installed, not configured) and `macher`, a gptel-based patch
   workflow (`lisp/init-ai.el:32-44`).
 - **munen** added gptel `ddgs_search` and `read_url` tools.
+- **oantolin** (added this refresh) runs gptel on Groq with
+  `openai/gpt-oss-120b` as the default, the same choice as spec 012
+  (`init.el:310-345`).
 - Sacha's gptel and agent-shell setup is unchanged.
 
 ### Language servers and tree-sitter
@@ -718,6 +723,37 @@ development status`.
 - The 2026-04-23 README says Kitchin no longer uses Emacs and is
   discontinuing scimax development, so do not treat this as a current
   daily-use AI config unless upstream activity resumes.
+
+### oantolin-emacs-config
+
+Omar Antolín Camarena's personal config, added 2026-09-26 during spec 016
+after Sacha's refresh showed her borrowing from it. He is the author of
+Embark and Orderless. The README states his approach: learn the built-in
+package first, write a tiny package for a small itch, and go shopping for
+external packages only for big ones. One `init.el` using `use-package`, plus
+small packages of his own in `user-lisp/`, which others (Sacha) load with
+`:vc`.
+
+Latest commit at the 2026-09-26 sync: `f11d436 2026-09-18 Binding for
+jinx-occur`. History from 2020-04; active through 2026.
+
+**What we've extracted so far:**
+
+- Nothing yet.
+
+**Likely future relevance:**
+
+- The authoritative reference for Embark, Orderless and Vertico setup
+  (`init.el:402-516`: completion styles, orderless dispatchers,
+  vertico-multiform, embark bindings).
+- gptel on Groq with `openai/gpt-oss-120b` as the default
+  (`init.el:310-345`), plus `user-lisp/gptel-extras.el` (`-mini`, `-define`)
+  — a direct comparison for spec 012's setup.
+- `user-lisp/` extras (isearch, narrow, window, comint, eshell) as small
+  built-in-first patterns.
+- Not a source for SQL, mise/direnv or eglot: `git grep -i -w` over its
+  `.el` files finds no `sql`, `postgres`, `mise`, `envrc`, `direnv`,
+  `exec-path` or `eglot`.
 
 ## Workflow
 
