@@ -8,9 +8,10 @@ workspace repo and travels with the project. The actual cloned repos in
 `reference-emacs-configs/` are a per-machine cache, rebuildable from the
 inventory in `reference-repos.list` via `just ref-show-plan`.
 
-**Last refreshed:** 2026-04-26 (AI/LLM reference expansion: five
-additional lived-in configs registered; Sacha promoted as a practical
-AI-workflow signal).
+**Last refreshed:** 2026-09-26 (spec 016: every repo brought up to date
+ahead of spec 015's SQL/PostgreSQL research; summary in
+[2026-09-26 refresh](#2026-09-26-refresh)). Previous: 2026-04-26 (AI/LLM
+reference expansion).
 
 ## Inventory vs. synthesis
 
@@ -54,7 +55,7 @@ the inventory.
 | abo-abo-dotemacs               | https://github.com/abo-abo/oremacs.git                | MEDIUM | Ivy-author counter-signal; Dired/vterm/Magit/Python micro-patterns |
 | sacha-chua-dotemacs            | https://github.com/sachac/.emacs.d                    | MEDIUM | practical gptel / agent-shell use in Org workflows |
 | munen-emacs.d                  | https://github.com/munen/emacs.d                      | MEDIUM | gptel custom tools; MCP integration |
-| redguardtoo-emacs.d            | https://github.com/redguardtoo/emacs.d                | MEDIUM | compact local Ollama gptel + Aider setup |
+| redguardtoo-emacs.d            | https://github.com/redguardtoo/emacs.d                | MEDIUM | compact gptel + macher + agent-shell setup |
 | abougouffa-minemacs            | https://github.com/abougouffa/minemacs                | MEDIUM | local/cloud LLM stack; Ellama, gptel, Aidermacs, MCP |
 | matthewzmd-emacs.d             | https://github.com/MatthewZMD/.emacs.d                | MEDIUM | Aidermacs author config; OpenRouter model defaults |
 | manateelazycat-lazycat-emacs   | https://github.com/manateelazycat/lazycat-emacs       | MEDIUM | OpenRouter gptel, Aidermacs, Emigo, Whisper |
@@ -68,6 +69,105 @@ Tier definitions:
   supplanted by HIGH/MEDIUM refs. Promote by adding a section here when a
   specific question makes the repo relevant again.
 
+## 2026-09-26 refresh
+
+Spec 016. Every repo in `reference-repos.list` was fast-forwarded to its
+upstream except `andreyorst-dotfiles` (see below). Ranges run from the SHA the
+inventory recorded at the 2026-04-26 sync; per-repo detail is in each repo's
+"2026-09-26 refresh" block under [Per-repo notes](#per-repo-notes).
+
+| repo | commits | span | activity |
+|------|---------|------|----------|
+| abougouffa-minemacs | 301 | 2026-04-26 → 2026-09-26 | very active |
+| jwiegley-dotemacs | 177 | 2026-04-28 → 2026-09-25 | very active |
+| redguardtoo-emacs.d | 63 | 2026-04-27 → 2026-09-24 | very active |
+| bbatsov-dotemacs | 62 | 2026-04-15 → 2026-07-29 | active |
+| yqrashawn-yqdotfiles | 56 | 2026-05-13 → 2026-09-22 | very active |
+| sacha-chua-dotemacs | 22 | 2026-05-28 → 2026-05-31 | bursts; quiet since June |
+| steve-purcell-dotemacs | 20 | 2026-06-18 → 2026-08-29 | active, small commits |
+| munen-emacs.d | 9 | 2026-05-21 → 2026-08-19 | moderate |
+| jkitchin-scimax | 2 | 2026-04-23 → 2026-04-28 | inactive (discontinued) |
+| abo-abo-dotemacs | 0 | last commit 2025-12-17 | quiet |
+| matthewzmd-emacs.d | 0 | last commit 2026-03-14 | quiet |
+| manateelazycat-lazycat-emacs | 0 | last commit 2026-02-23 | quiet |
+| danielmai-dotemacs | 0 | last commit 2023-02-15 | abandoned |
+| andreyorst-dotfiles | not refreshed | local clone last commit 2021-10-22 | see below |
+
+### SQL and PostgreSQL
+
+No repo changed anything SQL-related in its range. What exists today, all
+predating the range:
+
+- **steve-purcell-dotemacs** `lisp/init-sql.el` — the most complete
+  `sql.el` setup: `--no-psqlrc` in `sql-postgres-options`, `C-c C-z` to the
+  SQLi buffer, persistent `.sqli_history`, `sqlformat` on `C-c C-f`, and
+  `sanityinc/sql-explain-region-as-json` (EXPLAIN ANALYZE as JSON via `psql`).
+  `lisp/init-org.el:384` enables `ob-sql`.
+- **yqrashawn-yqdotfiles** — the only language-server and formatter setup:
+  `ejc-sql` with org-table results and a capf wrapper
+  (`.doom.d/prog.el:213-248`), `sqlfluff fix --dialect postgres` as the
+  sql-mode formatter (`.doom.d/lang.el:133-136`), `sqls` and `sqlfluff`
+  installed by nix, the `pg` client package, and a local Postgres with
+  pgvector.
+- **munen-emacs.d** — per-project `sql-postgres-login-params` saved as safe
+  dir-local values (`custom-settings.el:254,262`).
+- **jwiegley-dotemacs** — `sql` + `sql-indent` (`init.org:6355-6384`) and
+  `org-mssql` (`init.org:12014`), a possible template for an auth-source-backed
+  PostgreSQL equivalent. `edbi` was removed in the range.
+- **abougouffa-minemacs** — only lists `sqlformat`, `pg_format` and `sqlint`
+  in its external-tools catalogue (`core/me-external-tools.el`); no SQL
+  configuration.
+- Sacha and scimax use SQLite only; bbatsov and redguardtoo have no SQL setup.
+
+### Per-project environment (mise, direnv)
+
+No repo configures mise (`git grep -wi mise` over every refreshed tree; the
+only hits are commented-out `mise activate` lines in yqrashawn's zsh nix
+module). Purcell and yqrashawn use `envrc`; minemacs made its `envrc` module
+obsolete in 2025-10; the rest use `exec-path-from-shell`. Two repos pass
+per-project settings through safe `.dir-locals.el` values instead: munen for
+Postgres login parameters, minemacs for eglot's clangd arguments
+(`core/extras/me-eglot-x.el:246-272`). Whether Emacs can use mise directly
+is left to spec 015's research step.
+
+### Agents and LLMs
+
+- **jwiegley** dropped agent-shell, ACP, gptel-agent, macher and his LiteLLM
+  routing; kept gptel, claude-code-ide and aider. gptel backends are now one
+  function each, generated from a single host/model registry
+  (`lisp/gptel-backends.el`), defaulting to a Hermes Agent backend on his host
+  Vulcan. New `ob-agent-deck` launches coding-agent sessions from Org blocks.
+- **yqrashawn** rebuilt his gptel Claude Code proxy presets (long-lived
+  per-subtree sessions), added `ai-code` and `eca`, dropped copilot and
+  aidermacs, added MCP servers, and wrote a Claude Code PR-review plugin. His
+  gptel abort-logging advice (`.doom.d/llm.el`) is cheap to copy.
+- **minemacs** added `claude-code-ide` (`modules/me-ai.el:103-147`).
+- **redguardtoo** dropped aider and its local Ollama backends; added
+  `agent-shell` (installed, not configured) and `macher`, a gptel-based patch
+  workflow (`lisp/init-ai.el:32-44`).
+- **munen** added gptel `ddgs_search` and `read_url` tools.
+- Sacha's gptel and agent-shell setup is unchanged.
+
+### Language servers and tree-sitter
+
+bbatsov rebuilt around eglot plus built-in ts-modes, with guarded
+`major-mode-remap-alist` entries (`init.el:1178-1205`) and Flycheck 38's
+eglot bridge. Purcell disabled eglot semantic tokens. minemacs made the eglot
+contact configurable per project and added grammars.
+
+### Not refreshed, and candidates to drop
+
+- **andreyorst-dotfiles** — the local clone's `origin` points at
+  `https://github.com/andreyorst/dotfiles.git`, which now asks for
+  credentials; the inventory URL (`git@gitlab.com:andreyorst/dotfiles.git`)
+  answers. Fixing it means repointing the clone's remote.
+- **danielmai-dotemacs** — no commits since 2023-02-15.
+- **jkitchin-scimax** — discontinued upstream.
+- These clones in `reference-emacs-configs/` are not in the inventory, so the
+  tooling does not track them: `ebzzry-dotfiles`, `editorconfig-emacs`,
+  `greendog-gtd`, `howardabrams-dot-files`, `sirpscl-emacs.d`, `smartparens`.
+  They were left as they are.
+
 ## Current Landscape-Level Signals
 
 These are the cross-repo conclusions that currently matter most to
@@ -78,7 +178,7 @@ Jeff's roadmap:
   any broad language-mode work.
 - AI references now have a useful spread: jwiegley remains the ambitious
   ceiling; munen and yqrashawn cover custom tools / MCP; redguardtoo covers
-  compact local Ollama; Sacha covers practical Org/language-learning use;
+  a compact gptel + macher setup; Sacha covers practical Org/language-learning use;
   MinEmacs, MatthewZMD, and Lazycat show package-stack and agent choices.
 - John Kitchin's scimax is worth tracking for scientific Org workflows,
   org-db, and RAG-adjacent context, but not as current daily-driver AI config:
@@ -121,7 +221,15 @@ consulted during AI work:
 Steve Purcell's `emacs.d`. Most actively maintained reference in the set;
 small commits, cleanly incremental migrations.
 
-Latest commit at last sync: `5be20de8 2026-04-22 Add basic golang support`.
+Latest commit at the 2026-04-26 sync: `5be20de8 2026-04-22 Add basic golang support`.
+
+**2026-09-26 refresh** (`5be20de8..80e1470d`, 20 commits; latest
+`80e1470d 2026-08-29 Correction in README`): eglot semantic tokens disabled
+(`fa3dcf6`, `lisp/init-eglot.el`); Emacs 31 prep (`elisp-fontify-semantically`,
+corfu-terminal only below 31); minimum Emacs 28.1; expreg added on `C-=`/`C--`;
+`consult-xref` for xrefs; `session` dropped for `desktop-save-mode`. No SQL,
+environment or AI changes. `lisp/init-sql.el` (unchanged since 2023) is the
+lead reference for spec 015.
 
 **What we've extracted so far:**
 
@@ -173,7 +281,18 @@ John Wiegley's `dot-emacs`. The most sophisticated reference — uses
 literate-style org for everything, deep customization, *very* AI-heavy
 in 2025-2026.
 
-Latest commit at last sync: `1d50d3e3f 2026-04-22 changes`.
+Latest commit at the 2026-04-26 sync: `1d50d3e3f 2026-04-22 changes`.
+
+**2026-09-26 refresh** (`1d50d3e3f..9a512ede6`, 177 commits; latest
+`9a512ede6 2026-09-25 Remove documentation files`): submodules replaced by a
+Nix package bundle (`d00e29a88`); opt-in XDG state migration; agent-shell /
+ACP / gptel-agent / macher / ragmacs dropped (`aeb337efd`); LiteLLM routing
+and Anvil MCP dropped; gptel backends generated per function from one registry
+(`lisp/gptel-backends.el`, default Hermes Agent on Vulcan), OAuth backends
+removed; `org-agent-deck` / `ob-agent-deck` added; claude-code-ide still
+configured; `org-today-agenda.el` reads SQL results from a Claude skill;
+`edbi` removed; exec-path-from-shell now copies a named variable list. No
+mise, no eglot/tree-sitter change beyond path moves.
 
 **What we've extracted so far:**
 
@@ -208,8 +327,17 @@ Latest commit at last sync: `1d50d3e3f 2026-04-22 changes`.
 Bozhidar Batsov's `emacs.d`. Pragmatic, modern-leaning, opinionated
 choices.
 
-Latest commit at last sync: `d6cbae1 2026-04-06 Update tokyo-night setup
+Latest commit at the 2026-04-26 sync: `d6cbae1 2026-04-06 Update tokyo-night setup
 to reflect upstream changes`.
+
+**2026-09-26 refresh** (`d6cbae1..01286d8`, 62 commits; latest
+`01286d8 2026-07-29 Enable Flycheck inline diagnostics and the built-in eglot
+bridge`): new `early-init.el`; tree-sitter grammar recipes and guarded
+`major-mode-remap-alist` (`init.el:1160-1205`); eglot for every language he
+uses via ts-modes (`init.el:1242-1380`), `eglot-events-buffer-config
+'(:size 0)`, Flycheck 38 eglot bridge; completion additions (embark, cape,
+corfu-history, `completion-preview-mode`); swaps undo-tree→vundo,
+flyspell→jinx, vterm→mistty. No SQL, environment or AI changes.
 
 **What we've extracted so far:**
 
@@ -251,7 +379,7 @@ Ivy/Counsel/Hydra/Flycheck-era muscle memory. Do not use this as a clean
 2026 migration template. Use it to understand what a power user keeps,
 removes, and hand-tunes after years of daily use.
 
-Latest commit at last sync: `b17e90e 2025-12-17 packages.el: Remove
+Latest commit at the 2026-04-26 sync: `b17e90e 2025-12-17 packages.el: Remove
 docker-tramp`.
 
 **What we've extracted so far:**
@@ -317,8 +445,14 @@ docker-tramp`.
 Sacha Chua's `.emacs.d`. Organic, blog/journaling-heavy, less of a clean
 migration source, but now a concrete practical AI-workflow reference.
 
-Latest commit at last sync: `44d6958 2026-04-18 PDF` (on `gh-pages`
+Latest commit at the 2026-04-26 sync: `44d6958 2026-04-18 PDF` (on `gh-pages`
 branch — her config is published as her blog).
+
+**2026-09-26 refresh** (`44d6958..57c7f7b`, 22 commits, all
+2026-05-28 → 2026-05-31; latest `57c7f7b 2026-05-31 additional files`):
+tips borrowed from oantolin (Embark bindings, search/goto maps, `:vc`
+extras), popper, diff-hl in dired, link-hint, emacs-everywhere; publishing
+and streaming churn. gptel and agent-shell setup unchanged; SQLite only.
 
 **What we've extracted so far:**
 
@@ -363,8 +497,16 @@ Munen's `emacs.d`. Different AI flavor than jwiegley — heavy on custom
 gptel tools (filesystem read/write/edit, lint integration), uses MCP and
 agent-shell.
 
-Latest commit at last sync: `010121d 2026-04-15 feat: Add
+Latest commit at the 2026-04-26 sync: `010121d 2026-04-15 feat: Add
 edge-tts-speak-region`.
+
+**2026-09-26 refresh** (`010121d..c7be64d`, 9 commits; latest
+`c7be64d 2026-08-19 chore: Switch active things.org file`): gptel
+`ddgs_search` tool replaces `search_web` (`cdbc9a6`); gptel `read_url` tool via
+`url-retrieve` + `shr`, with guidance on which fetch tool to use (`2d2cc30`);
+ghostel terminal (`af977f1`); UTF-8 defaults for the daemon. Existing
+dir-local `sql-postgres-login-params` (`custom-settings.el:254,262`) is a
+per-project Postgres pattern.
 
 **What we've extracted so far:**
 
@@ -398,7 +540,16 @@ edge-tts-speak-region`.
 Chen Bin's `emacs.d`. Very popular, active, and useful as the compact
 local-first AI counterpoint to jwiegley's large stack.
 
-Latest commit at last sync: `8c892ed7 2026-04-19 use apeleia to format code`.
+Latest commit at the 2026-04-26 sync: `8c892ed7 2026-04-19 use apeleia to format code`.
+
+**2026-09-26 refresh** (`8c892ed7..d6f7674a`, 63 commits; latest
+`d6f7674a 2026-09-24 python snippet`): **the Ollama backends and aider noted
+below are gone** — hard-coded backends removed (`5f9aa2e6`), aider.el removed
+(`6e7353e4`); gptel now plain `use-package` with no pinned model; `macher`
+added (`lisp/init-ai.el:32-44`, Emacs 30+); `agent-shell` + `acp` installed but
+not configured. ivy/counsel replaced by vertico/orderless/consult/embark;
+apheleia formats shell with shfmt; minimum Emacs 29. No SQL or environment
+changes.
 
 **What we've extracted so far:**
 
@@ -421,7 +572,15 @@ Abdelhak Bougouffa's MinEmacs framework. More of an Emacs distribution
 than a single personal init, but active and broad enough to be useful for
 package-stack comparisons.
 
-Latest commit at last sync: `ae4967d6 2026-04-26 chore(version): v14.0.0`.
+Latest commit at the 2026-04-26 sync: `ae4967d6 2026-04-26 chore(version): v14.0.0`.
+
+**2026-09-26 refresh** (`ae4967d6..43dfa211`, 301 commits, v14.1.0 →
+v14.14.0; latest `43dfa211 2026-09-26 tweak: bump packages versions`):
+claude-code-ide added (`modules/me-ai.el:103-147`); per-project eglot clangd
+contact from safe dir-local variables (`core/extras/me-eglot-x.el:246-272`);
+more tree-sitter grammars and ts-modes; ghostel is the default terminal;
+yasnippet replaced by tempel; `once`/`satch` libraries removed. No SQL
+configuration; envrc module obsolete since 2025-10.
 
 **What we've extracted so far:**
 
@@ -443,7 +602,7 @@ Latest commit at last sync: `ae4967d6 2026-04-26 chore(version): v14.0.0`.
 Matthew Zeng's M-EMACS configuration. Useful mainly because Matthew is the
 Aidermacs author; the personal AI surface is smaller than the package repo.
 
-Latest commit at last sync: `e8a999b 2026-03-14 Update stuff`.
+Latest commit at the 2026-04-26 sync: `e8a999b 2026-03-14 Update stuff`.
 
 **What we've extracted so far:**
 
@@ -464,7 +623,7 @@ Latest commit at last sync: `e8a999b 2026-03-14 Update stuff`.
 Andy Stewart's `lazycat-emacs`. Highly customized, large surface area, and
 useful for seeing AI packages inside a long-running personal config.
 
-Latest commit at last sync: `200684c3 2026-02-23 Fix key echo error.`
+Latest commit at the 2026-04-26 sync: `200684c3 2026-02-23 Fix key echo error.`
 
 **What we've extracted so far:**
 
@@ -483,10 +642,19 @@ Latest commit at last sync: `200684c3 2026-02-23 Fix key echo error.`
 
 ### yqrashawn-yqdotfiles
 
-Yuan Fu's dotfiles. Advanced Doom-based AI reference with substantial
+yqrashawn's dotfiles. Advanced Doom-based AI reference with substantial
 custom gptel tooling, MCP server work, proxy backends, and tests.
 
-Latest commit at last sync: `900106d4 2026-04-25 fix: auq`.
+Latest commit at the 2026-04-26 sync: `900106d4 2026-04-25 fix: auq`.
+
+**2026-09-26 refresh** (`900106d4..db35cd8f`, 56 commits; latest
+`db35cd8f 2026-09-22 fix(pr-review)…`): Claude Code `pr-review-loop` plugin
+(babashka, `claude-code-plugins/`); gptel Claude Code proxy presets rebuilt
+with long-lived per-subtree sessions (`.doom.d/llm.el`); gptel abort logging;
+`ai-code` and `eca` added; copilot and aidermacs dropped; new mcp-hub servers.
+Predating the range, and the closest ready-made SQL setup across the
+references: `ejc-sql` (`.doom.d/prog.el:213-248`), `sqlfluff --dialect
+postgres` formatter (`.doom.d/lang.el:133-136`), `sqls` via nix.
 
 **What we've extracted so far:**
 
@@ -514,8 +682,12 @@ John Kitchin's scimax starterkit for scientists and engineers. This is the
 right Kitchin repo to track; `jkitchin/jmax` exists, but last moved in 2018
 and is not a current config reference.
 
-Latest commit at last sync: `f1f12ac1 2026-04-23 Update README with scimax
+Latest commit at the 2026-04-26 sync: `f1f12ac1 2026-04-23 Update README with scimax
 development status`.
+
+**2026-09-26 refresh** (`f1f12ac1..9cf9000`, 2 commits; latest
+`9cf9000 2026-04-28 Merge pull request #524…`): one outside fix to
+`scimax-ob.el` line numbers. Nothing relevant; upstream remains discontinued.
 
 **What we've extracted so far:**
 
