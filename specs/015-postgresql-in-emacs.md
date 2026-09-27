@@ -9,13 +9,15 @@ because the projects I am starting will have me writing detailed PostgreSQL.
 
 ## Outcome
 
-- [ ] Open a `.sql` file and get PostgreSQL-aware highlighting and indentation.
-- [ ] Send a statement, a region, or the whole buffer to a running PostgreSQL
-      session and see the results in Emacs.
-- [ ] Get completion of table and column names from the connected database.
-- [ ] See syntax errors as I type, before running anything.
-- [ ] Format a query with one command.
-- [ ] Write and run PostgreSQL in org documents, with results shown in the document.
+Done; each item names the `jmccarrell/literate-emacs.d` issue that delivered it.
+
+- [x] Open a `.sql` file and get PostgreSQL-aware highlighting and indentation. (#38)
+- [x] Send a statement, a region, or the whole buffer to a running PostgreSQL
+      session and see the results in Emacs. (#43)
+- [x] Get completion of table and column names from the connected database. (#51)
+- [x] See syntax errors as I type, before running anything. (#51)
+- [x] Format a query with one command. (#52)
+- [x] Write and run PostgreSQL in org documents, with results shown in the document. (#46)
 
 ## Workflows to support
 
