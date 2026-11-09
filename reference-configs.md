@@ -357,7 +357,7 @@ ticket. The decision is the Outcome of `specs/017-emacs-async-agent-work.md`.
   follows through process filters, sentinels and timers. Threads share one
   lock and switch only while waiting; `call-process` inside a thread still
   freezes the editor.
-- **Packages fall into two groups.** Some parse the agent's protocol and own
+- **Packages split by what Emacs sees.** Some parse the agent's protocol and own
   cancellation and per-request state: gptel (one curl per request),
   agent-shell over acp.el, eca, mcp.el. Others host a terminal interface and
   see only screen text: claude-code-ide (plus a WebSocket channel for editor
