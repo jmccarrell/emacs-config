@@ -149,8 +149,10 @@ is left to spec 015's research step.
   function each, generated from a single host/model registry
   (`lisp/gptel-backends.el`), defaulting to a Hermes Agent backend on his host
   Vulcan. New `ob-agent-deck` launches coding-agent sessions from Org blocks.
-- **yqrashawn** rebuilt his gptel Claude Code proxy presets (long-lived
-  per-subtree sessions), added `ai-code` and `eca`, dropped copilot and
+- **yqrashawn** rebuilt his gptel Claude Code presets (long-lived
+  per-subtree sessions) on two separate routes: an HTTP proxy on localhost
+  (the default `ccl` backend) and a gptel backend that runs the `claude` CLI
+  as a subprocess, added `ai-code` and `eca`, dropped copilot and
   aidermacs, added MCP servers, and wrote a Claude Code PR-review plugin. His
   gptel abort-logging advice (`.doom.d/llm.el`) is cheap to copy.
 - **minemacs** added `claude-code-ide` (`modules/me-ai.el:103-147`).
@@ -343,6 +345,42 @@ yqrashawn), `flymake-sqlfluff` and `sqlup-mode` (minemacs; the language
 server covers diagnostics), `pgmacs` (jwiegley; not needed yet), and
 jwiegley's `org-mssql` connection pattern (Microsoft SQL Server only, and it
 puts the password on the command line).
+
+## Async agent work (spec 017)
+
+Findings from the research tickets on map #31 (#32-#35), read 2026-11-08.
+The full write-ups sit on unmerged `research/*` branches, linked from each
+ticket. The decision is the Outcome of `specs/017-emacs-async-agent-work.md`.
+
+- **No config or AI package uses Lisp threads.** Parallel work is always an
+  outside process (curl, an agent CLI, a language or agent server) that Emacs
+  follows through process filters, sentinels and timers. Threads share one
+  lock and switch only while waiting; `call-process` inside a thread still
+  freezes the editor.
+- **Packages fall into two groups.** Some parse the agent's protocol and own
+  cancellation and per-request state: gptel (one curl per request),
+  agent-shell over acp.el, eca, mcp.el. Others host a terminal interface and
+  see only screen text: claude-code-ide (plus a WebSocket channel for editor
+  tools such as ediff), aidermacs.
+- **Streaming never blocks; the freezes are at the edges:** synchronous
+  tools, startup waits, synchronous management calls, `y-or-n-p` prompts.
+  munen's gptel tools are all synchronous. `gptel-abort` stops only the first
+  request in a buffer.
+- **jwiegley moved agent runtimes out of Emacs.** He keeps gptel (default
+  backend: a remote Hermes Agent), claude-code-ide and aider, and runs heavy
+  work in agent-deck on another host, launched from Org blocks with output
+  pulled into Org on demand. He removed agent-shell, gptel-agent, macher and
+  pi-coding-agent.
+- **yqrashawn is the only one with hand-written async code for agents:** a
+  gptel backend that runs the `claude` CLI with its own filter, sentinel and
+  timeout, registered so `gptel-abort` works; `file-notify` watchers on
+  sub-agent transcripts; one tool definition registered for both gptel and
+  Claude Code over MCP.
+- **Patterns worth copying:** a callback that runs only once plus a timeout
+  timer around every async call; capturing the workspace and directory when a
+  request starts; logging why requests die (yqrashawn's advice on gptel's
+  sentinel and abort); fanning out and consuming results in order (Sacha's
+  whisper queue).
 
 ## Current Landscape-Level Signals
 
@@ -667,7 +705,8 @@ and streaming churn. gptel and agent-shell setup unchanged; SQLite only.
 
 Munen's `emacs.d`. Different AI flavor than jwiegley — heavy on custom
 gptel tools (filesystem read/write/edit, lint integration), uses MCP and
-agent-shell.
+agent-shell. His mcp.el servers are not started automatically: auto-start is
+deliberately left off (`configuration.org:4012-4031`).
 
 Latest commit at the 2026-04-26 sync: `010121d 2026-04-15 feat: Add
 edge-tts-speak-region`.
@@ -821,8 +860,10 @@ Latest commit at the 2026-04-26 sync: `900106d4 2026-04-25 fix: auq`.
 
 **2026-09-26 refresh** (`900106d4..db35cd8f`, 56 commits; latest
 `db35cd8f 2026-09-22 fix(pr-review)…`): Claude Code `pr-review-loop` plugin
-(babashka, `claude-code-plugins/`); gptel Claude Code proxy presets rebuilt
-with long-lived per-subtree sessions (`.doom.d/llm.el`); gptel abort logging;
+(babashka, `claude-code-plugins/`); gptel Claude Code presets rebuilt
+with long-lived per-subtree sessions (`.doom.d/llm.el`), now split between an
+HTTP proxy and a separate CLI-subprocess backend
+(`modules/llm/gptel-claude-code/`); gptel abort logging;
 `ai-code` and `eca` added; copilot and aidermacs dropped; new mcp-hub servers.
 Predating the range, and the closest ready-made SQL setup across the
 references: `ejc-sql` (`.doom.d/prog.el:213-248`), `sqlfluff --dialect
