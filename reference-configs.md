@@ -8,10 +8,10 @@ workspace repo and travels with the project. The actual cloned repos in
 `reference-emacs-configs/` are a per-machine cache, rebuildable from the
 inventory in `reference-repos.list` via `just ref-show-plan`.
 
-**Last refreshed:** 2026-09-26 (spec 016: every repo brought up to date
-ahead of spec 015's SQL/PostgreSQL research; summary in
-[2026-09-26 refresh](#2026-09-26-refresh)). Previous: 2026-04-26 (AI/LLM
-reference expansion).
+**Last refreshed:** 2026-11-11 (spec 018 map: every repo brought up to
+date to plan the next config changes, AI first; summary in
+[2026-11-11 refresh](#2026-11-11-refresh)). Previous: 2026-09-26 (spec 016,
+ahead of spec 015's SQL/PostgreSQL research).
 
 ## Inventory vs. synthesis
 
@@ -69,6 +69,76 @@ Tier definitions:
 - **LOW / DORMANT** — Either inactive upstream, inventory-only, or
   supplanted by HIGH/MEDIUM refs. Promote by adding a section here when a
   specific question makes the repo relevant again.
+
+## 2026-11-11 refresh
+
+Spec 018 map (issue #45). Every repo in `reference-repos.list` was
+fast-forwarded to its upstream; ranges run from the SHA recorded at the
+2026-09-26 refresh. The deeper surveys are separate tickets on that map: AI
+changes in the configs (#47), upstream AI package changes (#48), and
+everything else (#49).
+
+| repo | commits | span | activity |
+|------|---------|------|----------|
+| redguardtoo-emacs.d | 37 | 2026-09-29 → 2026-11-11 | very active |
+| sacha-chua-dotemacs | 33 | 2026-09-17 → 2026-11-04 | active again |
+| yqrashawn-yqdotfiles | 31 | 2026-10-06 → 2026-11-11 | very active; mostly machine setup |
+| jwiegley-dotemacs | 21 | 2026-09-26 → 2026-11-10 | active |
+| protesilaos-dotfiles | 17 | 2026-09-29 → 2026-11-01 | active |
+| abougouffa-minemacs | 15 | 2026-09-29 → 2026-10-29 | active; mostly version bumps |
+| oantolin-emacs-config | 14 | 2026-10-06 → 2026-11-08 | active |
+| munen-emacs.d | 6 | 2026-10-01 → 2026-10-19 | moderate |
+| steve-purcell-dotemacs | 1 | 2026-10-18 | quiet |
+| abo-abo-dotemacs | 0 | last commit 2025-12-17 | quiet |
+| andreyorst-dotfiles | 0 | last commit 2026-09-04 | quiet |
+| bbatsov-dotemacs | 0 | last commit 2026-07-29 | quiet |
+| matthewzmd-emacs.d | 0 | last commit 2026-03-14 | quiet |
+| manateelazycat-lazycat-emacs | 0 | last commit 2026-02-23 | quiet; clone needs repair |
+
+### Agents and LLMs
+
+- **oantolin removed gptel** (2026-11-08): "It keeps freezing Emacs", and he
+  did not use it enough to debug it. Earlier in the range he had removed
+  `gptel-extras-mini` and added a workaround for a gptel bug sending output
+  to the wrong buffer.
+- **jwiegley** grew `ob-agent-deck` and `org-agent-deck` (sessions on
+  agent-deck remotes, a background command runner, joining agent-mail, an
+  `:ultracode` option for Claude and Codex). He dropped claude-code-ide's
+  Emacs tools (`claude-code-ide-emacs-tools-setup`, `ab0235976`) because his
+  Nix wrapper around `claude` refuses the `--mcp-config` flag that passes
+  them. His gptel setup is unchanged.
+- **redguardtoo** configured `agent-shell` with a DeepSeek agent over ACP
+  (`lisp/init-ai.el`).
+- **Sacha** added an OpenRouter gptel backend with free models.
+- **yqrashawn**'s Emacs changes are MCP server registration in
+  `.doom.d/mcp.el` (with a new test file) and a fix for non-ASCII text when
+  rewriting `~/.claude.json`; he dropped his rtk Claude Code hook.
+
+### Other areas
+
+- **Completion and editing:** redguardtoo replaced `company-statistics` with
+  `company-prescient`, switched to `ast-grep` for structural search and
+  `web-mode` for `.tsx`, and removed `auto-package-update`. Protesilaos set
+  `completion-flex-nospace` to nil and dropped Flymake's fancy indicators.
+- **Markdown and Org:** oantolin moved to `markdown-ts-mode` and turned on
+  `visual-line-mode` in Org buffers; Protesilaos adopted `denote-data-mode`.
+- **Packages dropped:** Purcell dropped `docker-compose-mode`.
+- **minemacs** supports more than one compilation database per project.
+- **jwiegley** added `dired-filter` and bookmark-backed Dired groups.
+- **Sacha** and **munen** changes are personal workflow (speech-to-text,
+  video, mu4e, Pomodoro) with nothing to adopt.
+
+No repo changed anything for SQL, PostgreSQL, language-server setup, mise or
+direnv.
+
+### Repair, and candidates to drop
+
+- **manateelazycat-lazycat-emacs** — the local clone has every file staged
+  for deletion (empty index, `HEAD` at `200684c3`), so it was not pulled.
+  Upstream has no new commits. `git -C reference-emacs-configs/manateelazycat-lazycat-emacs reset --hard`
+  restores it; left for Jeff. No commits since 2026-02-23.
+- **abo-abo-dotemacs** — no commits since 2025-12-17; a drop candidate if it
+  stays quiet. **matthewzmd-emacs.d** — none since 2026-03-14.
 
 ## 2026-09-26 refresh
 
