@@ -36,7 +36,8 @@ ticket that holds the detail. The evidence is in the map's research tickets
   processes. Emacs follows them through process filters, sentinels and
   timers, which is what every reference config and AI package does. (#36)
 - **Short requests go to gptel.** One prompt, one streamed answer into a
-  buffer; several may run at once in different buffers. gptel gets no tools.
+  buffer; several may run at once in different buffers. gptel gets no
+  PostgreSQL tools.
   (#36, #41)
 - **Long-running coding agents go to claude-code-ide.** The `claude` CLI runs
   in a **vterm** buffer, one or more sessions per project, so my existing
@@ -82,15 +83,16 @@ ticket that holds the detail. The evidence is in the map's research tickets
 
 ## Build plan
 
-Each step names the `jmccarrell/literate-emacs.d` issue that delivers it, once
-filed.
+Each step names the `jmccarrell/literate-emacs.d` issue that delivers it.
 
-- [ ] **claude-code-ide in vterm**, with the built-in Emacs tools on.
+- [ ] **claude-code-ide in vterm**, with the built-in Emacs tools on. (#57)
 - [ ] **Session status:** the copied receiver, the `--settings` hooks, the
       `CLAUDE_BUFFER_NAME` advice, and the display. Needs claude-code-ide.
+      (#58)
 - [ ] **PostgreSQL read tools:** describe schema, run query, explain. Needs
-      claude-code-ide and the read-only agent login.
+      claude-code-ide and the read-only agent login. (#59)
 - [ ] **PostgreSQL run write tool.** Needs the read tools and the writer login.
+      (#60)
 
 Work in other repos, not started:
 
