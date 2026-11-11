@@ -40,15 +40,17 @@ ticket that holds the detail. The evidence is in the map's research tickets
   PostgreSQL tools.
   (#36, #41)
 - **Long-running coding agents go to claude-code-ide.** The `claude` CLI runs
-  in a **vterm** buffer, one or more sessions per project, so my existing
+  in a **ghostel** buffer, one or more sessions per project, so my existing
   Claude Code settings, skills and CLAUDE.md files apply. Through its
   WebSocket connection Claude opens files, reads the selection and
-  diagnostics, and proposes edits as ediff sessions. (#36)
+  diagnostics, and proposes edits as ediff sessions. (#36; ghostel replaced
+  vterm in `literate-emacs.d` #66)
   - Claude Code's permission prompts and allow-lists stay on; no
     `--dangerously-skip-permissions`.
   - It loads on any machine where `claude` is on `PATH`, not only where
     `jwm/personal-mac-p` is true.
-  - vterm builds its native module with cmake on each machine.
+  - ghostel offers to download its prebuilt native module on first use; no
+    cmake or libvterm.
 - **Session status reaches Emacs through Claude Code hooks**, the pattern
   claude-code.el uses. (#39, #42, #44)
   - Hooks added through `--settings` on sessions claude-code-ide launches
@@ -83,23 +85,21 @@ ticket that holds the detail. The evidence is in the map's research tickets
 
 ## Build plan
 
-Each step names the `jmccarrell/literate-emacs.d` issue that delivers it.
+Done; each item names the `jmccarrell/literate-emacs.d` issue that delivered it.
+The execution map was `literate-emacs.d` #61.
 
-- [ ] **claude-code-ide in vterm**, with the built-in Emacs tools on. (#57)
-- [ ] **Session status:** the copied receiver, the `--settings` hooks, the
-      `CLAUDE_BUFFER_NAME` advice, and the display. Needs claude-code-ide.
-      (#58)
-- [ ] **PostgreSQL read tools:** describe schema, run query, explain. Needs
-      claude-code-ide and the read-only agent login. (#59)
-- [ ] **PostgreSQL run write tool.** Needs the read tools and the writer login.
-      (#60)
+- [x] **claude-code-ide**, with the built-in Emacs tools on. (#57, then #66 moved
+      sessions to ghostel and #67 retired vterm)
+- [x] **Session status:** the copied receiver, the `--settings` hooks, the
+      `CLAUDE_BUFFER_NAME` advice, and the display. (#58)
+- [x] **PostgreSQL read tools:** describe schema, run query, explain. (#59)
+- [x] **PostgreSQL run write tool.** (#60)
 
-Work in other repos, not started:
+Work in other repos, done:
 
-- `mcc-lab/lab-infra`: create a read-only agent login and an agent writer login
-  with the same grants as `artofpg_rw` (`artofpg_rw` is not reused or widened),
-  in `infrastructure/cnpg-cluster/rbac/roles-spec.yaml`; the local container's
-  setup needs them too.
-- art-of-postgresql repo: set `PGUSER_AGENT` and `PGUSER_AGENT_WRITE` in
-  `mise.toml` for both targets, and update AGENTS.md so agents may write rows to
-  folio.
+- `mcc-lab/lab-infra` #1545: the read-only and writer agent logins on folio
+  (lab-gitops #518, lab-infra #1552).
+- `jmccarrell/art-of-postgresql` #15: their grants as a Sqitch change deployed to
+  folio, the local container, `.pgpass`, `PGUSER_AGENT` and `PGUSER_AGENT_WRITE`
+  in `mise.toml`, and AGENTS.md allowing agent row writes to folio.
+- `jmccarrell/jwm-bin` #45: `libvterm` dropped from the Brewfile.
