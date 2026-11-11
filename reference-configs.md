@@ -103,8 +103,10 @@ everything else (#49).
   to the wrong buffer.
 - **jwiegley** grew `ob-agent-deck` and `org-agent-deck` (sessions on
   agent-deck remotes, a background command runner, joining agent-mail, an
-  `:ultracode` option for Claude and Codex). gptel and claude-code-ide setup
-  unchanged.
+  `:ultracode` option for Claude and Codex). He dropped claude-code-ide's
+  Emacs tools (`claude-code-ide-emacs-tools-setup`, `ab0235976`) because his
+  Nix wrapper around `claude` refuses the `--mcp-config` flag that passes
+  them. His gptel setup is unchanged.
 - **redguardtoo** configured `agent-shell` with a DeepSeek agent over ACP
   (`lisp/init-ai.el`).
 - **Sacha** added an OpenRouter gptel backend with free models.
