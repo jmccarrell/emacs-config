@@ -18,47 +18,86 @@ possible.
 
 ## Scope
 
-Planning only: the outcome is a decision recorded in this spec, not configuration
-in `literate-emacs.d`. A PostgreSQL-aware agent workflow is the motivating use
-case and comes after the decision.
+The wayfinder map #31 made the decisions; they are recorded under Outcome.
+Building them in `literate-emacs.d` is tracked under Build plan, one
+`literate-emacs.d` branch per step. A PostgreSQL-aware agent workflow is the
+motivating use case.
 
 Related: spec 010 covers the opposite direction, an external agent calling into
 Emacs.
 
 ## Outcome
 
-Decided in "Choose how Emacs launches and monitors parallel agent work"
-(#36), on the wayfinder map #31. The evidence is in that map's research
-tickets (#32-#35).
+Decided on the wayfinder map #31; each item names the `jmccarrell/emacs-config`
+ticket that holds the detail. The evidence is in the map's research tickets
+(#32-#35).
 
 - **No Lisp threads, no child Emacs.** Agents always run as outside
   processes. Emacs follows them through process filters, sentinels and
-  timers, which is what every reference config and AI package does.
+  timers, which is what every reference config and AI package does. (#36)
 - **Short requests go to gptel.** One prompt, one streamed answer into a
-  buffer; several may run at once in different buffers.
+  buffer; several may run at once in different buffers. gptel gets no tools.
+  (#36, #41)
 - **Long-running coding agents go to claude-code-ide.** The `claude` CLI runs
   in a **vterm** buffer, one or more sessions per project, so my existing
   Claude Code settings, skills and CLAUDE.md files apply. Through its
   WebSocket connection Claude opens files, reads the selection and
-  diagnostics, and proposes edits as ediff sessions.
+  diagnostics, and proposes edits as ediff sessions. (#36)
   - Claude Code's permission prompts and allow-lists stay on; no
     `--dangerously-skip-permissions`.
   - It loads on any machine where `claude` is on `PATH`, not only where
     `jwm/personal-mac-p` is true.
   - vterm builds its native module with cmake on each machine.
-- **Monitoring starts with what the package gives:** its session list,
-  switching, and stopping one or all sessions. A status list fed by Claude
-  Code hooks (finished, waiting for input) comes later.
-- **Tools.** Turn on the built-in Emacs tools
-  (`claude-code-ide-emacs-tools-setup`). PostgreSQL tools (run a query in the
-  SQL session, read the schema, fetch an EXPLAIN plan) come later, on the
-  spec 015 setup. Each tool is written once and offered to both Claude and
-  gptel.
+- **Session status reaches Emacs through Claude Code hooks**, the pattern
+  claude-code.el uses. (#39, #42, #44)
+  - Hooks added through `--settings` on sessions claude-code-ide launches
+    call `emacsclient` on `Notification` (needs me), `Stop` (turn done),
+    `UserPromptSubmit` (working) and `SessionEnd` (ended). Global Claude
+    settings are untouched.
+  - The receiver is copied from claude-code.el (`03199df`, Apache-2.0) under
+    the `jwm/` prefix: an event hook and the `emacsclient` entry point.
+    claude-code.el itself is not installed.
+  - Each session is named by `CLAUDE_BUFFER_NAME`, added by `:around` advice
+    on `claude-code-ide--create-terminal-session`, as minemacs advises it.
+  - Display: a message and a mode-line flash; a macOS notification when a
+    session needs permission or is waiting for input.
+- **Tools.** Claude gets claude-code-ide's built-in Emacs tools
+  (`claude-code-ide-emacs-tools-setup`) and the PostgreSQL tools below,
+  defined for claude-code-ide only, as jwiegley does. (#36, #41)
+- **PostgreSQL tools:** describe schema, run query, explain, and run write.
+  (#40, #43)
+  - Each call is its own `psql -X --csv` process, with server-side timeouts,
+    a 35-second Emacs timer, and a cap of 200 rows or 64 KB of output.
+  - The project's mise environment names the logins: `PGUSER_AGENT` for the
+    read tools, `PGUSER_AGENT_WRITE` for run write. A tool refuses when its
+    variable is unset.
+  - The login alone limits what an agent can do. A write commits like any
+    other statement, with no confirmation in Emacs. Targets are whatever the
+    project points at, the local container or folio.
+  - Schema changes are not a tool; they stay Sqitch changes.
 - **No blocking calls in agent code I write.** Every tool or helper is
   asynchronous: `make-process` with a callback, a timeout timer, and a
   callback that runs only once. No `call-process`,
-  `shell-command-to-string` or `url-retrieve-synchronously`.
+  `shell-command-to-string` or `url-retrieve-synchronously`. (#36)
 
-Open decisions on the map: how Claude Code session status reaches Emacs,
-which PostgreSQL tools an agent gets, and how one tool definition serves
-both gptel and claude-code-ide.
+## Build plan
+
+Each step names the `jmccarrell/literate-emacs.d` issue that delivers it, once
+filed.
+
+- [ ] **claude-code-ide in vterm**, with the built-in Emacs tools on.
+- [ ] **Session status:** the copied receiver, the `--settings` hooks, the
+      `CLAUDE_BUFFER_NAME` advice, and the display. Needs claude-code-ide.
+- [ ] **PostgreSQL read tools:** describe schema, run query, explain. Needs
+      claude-code-ide and the read-only agent login.
+- [ ] **PostgreSQL run write tool.** Needs the read tools and the writer login.
+
+Work in other repos, not started:
+
+- `mcc-lab/lab-infra`: create a read-only agent login and an agent writer login
+  with the same grants as `artofpg_rw` (`artofpg_rw` is not reused or widened),
+  in `infrastructure/cnpg-cluster/rbac/roles-spec.yaml`; the local container's
+  setup needs them too.
+- art-of-postgresql repo: set `PGUSER_AGENT` and `PGUSER_AGENT_WRITE` in
+  `mise.toml` for both targets, and update AGENTS.md so agents may write rows to
+  folio.
