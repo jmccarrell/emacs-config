@@ -32,6 +32,9 @@ ticket that holds the detail. The refresh is in `reference-configs.md` (#46, PR
 Each item is one `literate-emacs.d` worktree and pull request, built in this
 order.
 
+Done: item 1 in `jmccarrell/literate-emacs.d` PR #73, item 2 in PR #75, item 3
+in PR #74.
+
 1. **Replace the hand-written gptel tools with `llm-tool-collection`.** (#50,
    #51)
    - Register its `filesystem`, `editing` and `introspection` tags with
