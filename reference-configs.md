@@ -52,13 +52,11 @@ the inventory.
 | jwiegley-dotemacs              | https://github.com/jwiegley/dot-emacs                 | HIGH   | AI / LLM integration; gptel; local models |
 | yqrashawn-yqdotfiles           | https://github.com/yqrashawn/yqdotfiles               | HIGH   | advanced gptel tools, MCP, agent/proxy backends |
 | bbatsov-dotemacs               | https://github.com/bbatsov/emacs.d                    | MEDIUM | pragmatic 2026 modernizations; theme + UI nits |
-| abo-abo-dotemacs               | https://github.com/abo-abo/oremacs.git                | MEDIUM | Ivy-author counter-signal; Dired/vterm/Magit/Python micro-patterns |
 | sacha-chua-dotemacs            | https://github.com/sachac/.emacs.d                    | MEDIUM | practical gptel / agent-shell use in Org workflows |
 | munen-emacs.d                  | https://github.com/munen/emacs.d                      | MEDIUM | gptel custom tools; MCP integration |
 | redguardtoo-emacs.d            | https://github.com/redguardtoo/emacs.d                | MEDIUM | compact gptel + macher + agent-shell setup |
 | abougouffa-minemacs            | https://github.com/abougouffa/minemacs                | MEDIUM | local/cloud LLM stack; Ellama, gptel, Aidermacs, MCP |
 | matthewzmd-emacs.d             | https://github.com/MatthewZMD/.emacs.d                | MEDIUM | Aidermacs author config; OpenRouter model defaults |
-| manateelazycat-lazycat-emacs   | https://github.com/manateelazycat/lazycat-emacs       | MEDIUM | OpenRouter gptel, Aidermacs, Emigo, Whisper |
 | oantolin-emacs-config          | https://github.com/oantolin/emacs-config              | MEDIUM | Embark / Orderless / Vertico author config; built-ins first; Groq gptel |
 | protesilaos-dotfiles           | https://github.com/protesilaos/dotfiles               | MEDIUM | literate config in modules; built-ins first; completion, Dired, Org, windows |
 
@@ -136,9 +134,9 @@ direnv.
 - **manateelazycat-lazycat-emacs** — the local clone has every file staged
   for deletion (empty index, `HEAD` at `200684c3`), so it was not pulled.
   Upstream has no new commits. `git -C reference-emacs-configs/manateelazycat-lazycat-emacs reset --hard`
-  restores it; left for Jeff. No commits since 2026-02-23.
-- **abo-abo-dotemacs** — no commits since 2025-12-17; a drop candidate if it
-  stays quiet. **matthewzmd-emacs.d** — none since 2026-03-14.
+  restores it; left for Jeff. No commits since 2026-02-23. Dropped 2026-11-12.
+- **abo-abo-dotemacs** — no commits since 2025-12-17. Dropped 2026-11-12.
+  **matthewzmd-emacs.d** — none since 2026-03-14; kept.
 
 ## 2026-09-26 refresh
 
@@ -463,12 +461,9 @@ Jeff's roadmap:
 - AI references now have a useful spread: jwiegley remains the ambitious
   ceiling; munen and yqrashawn cover custom tools / MCP; redguardtoo covers
   a compact gptel + macher setup; Sacha covers practical Org/language-learning use;
-  MinEmacs, MatthewZMD, and Lazycat show package-stack and agent choices.
+  MinEmacs and MatthewZMD show package-stack and agent choices.
 - bbatsov is best for small, pragmatic quality-of-life upgrades and modern
   defaults that can land as tight cleanup commits.
-- abo-abo is now an active counter-signal rather than a dormant reference:
-  still Ivy/Counsel/Hydra/Flycheck-flavored, but using Eglot/Ruff/vterm and
-  pruning unused package surface.
 - Sacha is useful when the question touches Org, publishing, blogging,
   transcription, or "what has filtered into long-running daily use?" She is
   now also a practical gptel / agent-shell reference rather than only an
@@ -651,75 +646,6 @@ enhancements" sub-goal:
 - `Highlight current error in compilation/grep buffers`.
 - Theme: tokyo-night (latest update 2026-04-06).
 
-### abo-abo-dotemacs
-
-Oleh Krehel's `oremacs`. Highly active, highly personal, and useful as a
-counter-signal: as the Ivy author, he naturally still carries a lot of
-Ivy/Counsel/Hydra/Flycheck-era muscle memory. Do not use this as a clean
-2026 migration template. Use it to understand what a power user keeps,
-removes, and hand-tunes after years of daily use.
-
-Latest commit at the 2026-04-26 sync: `b17e90e 2025-12-17 packages.el: Remove
-docker-tramp`.
-
-**What we've extracted so far:**
-
-- Phase 0 landscape: active-evolution signal, but not one of the clean
-  migration templates.
-- 2026-04-25 refresh: 227 commits since `0c5f328` were reviewed for
-  backlog relevance. The useful signal is mostly in topic modules rather
-  than wholesale package choices.
-
-**Likely future relevance:**
-
-- Dired / Dirvish investigation: `modes/ora-dired.el` is a strong
-  "power-user Dired, not Dirvish" counterexample. Mine it for small Dired
-  affordances first (archive binding, omit rules, `dired-dwim-target`,
-  remote/TRAMP adjustments, file-size helpers) before deciding that a
-  full Dirvish front-end is worth the surface area.
-- Eat / terminal investigation: he added `vterm` rather than `eat`.
-  Together with Munen's vterm adoption and Purcell's eat adoption, this
-  gives us the right comparison frame: pure-Elisp portability versus
-  native-module terminal fidelity.
-- Verb / HTTP investigation: he added `restclient` support, not `verb`.
-  That is evidence that the restclient family is still viable for power
-  users; `verb` needs to win on concrete org workflow benefits, not just
-  novelty.
-- Magit worktree / ecosystem investigation: his Magit module binds
-  `magit-diff-visit-worktree-file`, adds `magit-ediff`, and prunes status
-  sections/headers for a denser status buffer. Read this when evaluating
-  Magit's worktree affordances and small Magit UX improvements.
-- Python follow-ups: `modes/ora-flycheck-ruff.el` and
-  `modes/ora-python.el` confirm Ruff's importance, but he keeps a very
-  custom Flycheck/Jedi setup and explicitly disables some Eglot/Flymake
-  behavior to fix completion delay. Treat this as troubleshooting signal
-  for Eglot completion latency, not as a reason to unwind our
-  Flymake-first Python migration.
-
-**Notable recent activity (as of 2026-04-25 sync):**
-
-- `modes/ora-python.el: Fix eglot completion delay` — disables Eglot's
-  completion-provider resolution path and removes Eglot's Flymake backend
-  from managed buffers. Useful if our Python buffers ever feel sluggish
-  under Eglot; not something to preemptively copy.
-- `modes/ora-flycheck-ruff.el: Add` — converges on Ruff diagnostics, but
-  via Flycheck. Our `flymake-ruff` choice remains better aligned with
-  built-in Eglot/Flymake.
-- `modes/ora-vterm.el: Add` and later updates — vterm is the active
-  terminal choice in this reference.
-- `modes/ora-http.el: Add` — a small `restclient-mode` workflow, relevant
-  to the `verb` comparison.
-- `modes/ora-javascript.el: Don't start lsp` — corroborates our current
-  "no JS LSP unless pain appears" stance. It does not argue against the
-  small cleanup pass from `js2-mode` toward `js-ts-mode`.
-- `modes/ora-nextmagit.el: Fix magit-diff-visit-worktree-file`, followed
-  later by `modes/ora-nextmagit.el: Remove` and a self-contained
-  `modes/ora-magit.el` — useful Magit patterns were consolidated, not
-  abandoned.
-- `packages.el: Remove docker-tramp` and `Clean up unused packages` —
-  reinforces the ongoing cleanup theme: remove latent package surface
-  when actual call sites disappear.
-
 ### sacha-chua-dotemacs
 
 Sacha Chua's `.emacs.d`. Organic, blog/journaling-heavy, less of a clean
@@ -899,28 +825,6 @@ Latest commit at the 2026-04-26 sync: `e8a999b 2026-03-14 Update stuff`.
   and weak model, and whether to use `comint` or terminal-backed agent UI.
 - Treat `MatthewZMD/aidermacs` itself as the package-level source of truth.
 
-### manateelazycat-lazycat-emacs
-
-Andy Stewart's `lazycat-emacs`. Highly customized, large surface area, and
-useful for seeing AI packages inside a long-running personal config.
-
-Latest commit at the 2026-04-26 sync: `200684c3 2026-02-23 Fix key echo error.`
-
-**What we've extracted so far:**
-
-- 2026-04-26 AI reference expansion: `site-lisp/config/init-gptel.el`
-  configures gptel through OpenRouter, binds RET in `gptel-mode`, and adds
-  a small `gptel-request` helper for pinyin-to-Chinese conversion.
-- `init-aidermacs.el` configures Aidermacs with OpenRouter Claude 3.7
-  Sonnet; `init-emigo.el` enables Emigo with OpenRouter Gemini 2.5; the
-  repo also has `init-whisper.el`.
-
-**Likely future relevance:**
-
-- Useful for OpenRouter-centric setups, Emigo comparison, and "AI as a
-  cluster of small packages" rather than one gptel-only stack.
-- Less useful as a clean migration template; expect many local conventions.
-
 ### yqrashawn-yqdotfiles
 
 yqrashawn's dotfiles. Advanced Doom-based AI reference with substantial
@@ -1084,6 +988,9 @@ Removed from the inventory; their notes live in git history.
   Jeff's original config, which still credits it.
 - `jkitchin-scimax` (2026-09-26): Kitchin discontinued scimax development on
   2026-04-23 and no longer uses Emacs.
+- `abo-abo-dotemacs` (2026-11-12): no commits since 2025-12-17.
+- `manateelazycat-lazycat-emacs` (2026-11-12): no commits since 2026-02-23,
+  and its local clone had every file staged for deletion.
 
 ## Updating this file
 
