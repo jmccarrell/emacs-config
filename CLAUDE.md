@@ -15,7 +15,6 @@ emacs-config/
 ├── literate-emacs.d.worktrees/   ← ignored container for config worktrees
 │   └── <feature>/                ← optional config feature worktree
 └── reference-emacs-configs/      ← cloned reference repos (read-only, for inspiration)
-    ├── abo-abo-dotemacs/
     ├── bbatsov-dotemacs/
     ├── jwiegley-dotemacs/
     ├── munen-emacs.d/
