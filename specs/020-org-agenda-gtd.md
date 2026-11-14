@@ -64,7 +64,11 @@ out unless a decision above needs them.
 - **Built-in Org only** for the first slice; `org-super-agenda` and `org-ql`
   wait until a built-in view falls short.
 
+- **No context tags.** The file is the work stream, and the agenda groups and
+  filters by it. The tags already on headings in `someday.org` (`emacs`,
+  `read_review`, `@train`, `org`, and others) are removed, so `project` is the
+  only tag in the agenda files.
+
 ### Open
 
-- Context tags.
 - The build order.
