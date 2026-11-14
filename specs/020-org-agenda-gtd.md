@@ -52,4 +52,19 @@ out unless a decision above needs them.
 
 ## Outcome
 
-To be filled in once the decisions are made.
+### Decided
+
+- **Projects** carry a `project` tag that children don't inherit (listed in
+  `org-tags-exclude-from-inheritance`), as in sacha-chua.
+- **`DEFERRED` becomes a live state.** It moves left of the `|`, so deferred
+  items stay open and can have their own block in the weekly review.
+- **Priority**: `A` to `C` with `B` as the default. The dashboard opens with
+  protesilaos's block of `[#A]` tasks that have no scheduled date or deadline;
+  the rest of the agenda keeps the default urgency sort.
+- **Built-in Org only** for the first slice; `org-super-agenda` and `org-ql`
+  wait until a built-in view falls short.
+
+### Open
+
+- Context tags.
+- The build order.
