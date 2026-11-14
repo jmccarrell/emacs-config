@@ -45,9 +45,10 @@ already the work stream. I want to replace it.
 ## Scope
 
 Planning only: the outcome is the list of changes, not configuration in
-`literate-emacs.d`. Restructuring my Org files under `~/jwm/todo` is part of
-the plan, with the order of files and whether `org-refile-targets` changes. Capture, habits and
-`org-edna` stay out unless a decision above needs them.
+`literate-emacs.d`. The plan includes restructuring my Org files under
+`~/jwm/todo`: which files change, in what order, and whether
+`org-refile-targets` changes with them. Capture, habits and `org-edna` stay
+out unless a decision above needs them.
 
 ## Outcome
 
