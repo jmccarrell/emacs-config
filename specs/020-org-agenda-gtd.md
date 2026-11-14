@@ -68,7 +68,27 @@ out unless a decision above needs them.
   filters by it. The tags already on headings in `someday.org` (`emacs`,
   `read_review`, `@train`, `org`, and others) are removed, so `project` is the
   only tag in the agenda files.
+- **Projects**: an open project heading has no TODO keyword; a finished one
+  gets `DONE` or `CANCELLED`. A project with a `NEXT`, `DOING` or `WAITING`
+  item beneath it is not stuck.
+- **Inbox and Misc**: capture `t` writes to `* Inbox` in `todo.org`, emptied
+  at each weekly review. Each area file has a `* Misc` heading for sorted
+  tasks that belong to no project. Every area gets its own file, so `todo.org`
+  holds only Inbox and Misc.
+- **someday.org** stays as the Someday/Maybe list for things I haven't
+  committed to, but starts this work empty: its contents move to
+  `someday.org_archive`, old tags with them. It stays in the agenda files so
+  refile reaches it, and is left out of the daily views. `DEFERRED` is for
+  paused items I still mean to do, which stay in their area file.
+- **Defaults**: the dashboard is `C-c a g`; refile takes steve-purcell's
+  settings with `:maxlevel 3`. My "Personal Weekly Review" tickler entry stays
+  as the reminder, and the weekly-review command is what I run when it fires.
+- Archive files keep their tags; nothing in this work touches them.
 
 ### Open
 
+Worked on the wayfinder map for spec 020.
+
+- Which area files `todo.org` splits into.
+- What the GTD dashboard and the weekly review show.
 - The build order.

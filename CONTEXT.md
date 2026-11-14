@@ -99,3 +99,8 @@ _Avoid_: Inbox, Tasks section
 **Deferred**:
 A paused item that stays open in its Area because Jeff still means to do it.
 _Avoid_: Someday, cancelled
+
+**Someday**:
+The list of things Jeff has not committed to, kept in its own file outside
+any Area and left out of the daily views.
+_Avoid_: Deferred, backlog
