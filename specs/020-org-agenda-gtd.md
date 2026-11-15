@@ -91,14 +91,14 @@ out unless a decision above needs them.
   `HOLD` is for paused items I still mean to do, which stay in their area.
 - **Built-in Org only**; `org-super-agenda` and `org-ql` wait until a built-in
   view falls short.
-- **Refile** takes steve-purcell's settings with `:maxlevel 3`. My "Personal
-  Weekly Review" tickler entry stays as the reminder, and the weekly-review
-  command is what I run when it fires.
+- **One agenda view**: the dashboard is the only custom view this work builds.
+  There is no separate weekly-review command; when my "Personal Weekly Review"
+  tickler entry fires, I open the dashboard and press `l` to see what I closed.
+- **Refile** takes steve-purcell's settings with `:maxlevel 3`.
 - Archive files keep their tags; nothing in this work touches them.
 
 ### Open
 
 Worked on the wayfinder map for spec 020.
 
-- What the weekly review shows.
 - The build order.
