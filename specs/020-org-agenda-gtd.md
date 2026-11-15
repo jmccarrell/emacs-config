@@ -102,6 +102,9 @@ out unless a decision above needs them.
 Decided on the wayfinder map #75; the area split is in #76 and its
 amendments. Three pull requests, in this order:
 
+Done: item 1 in `jmccarrell/literate-emacs.d` PR #88, item 2 in
+`jmccarrell/jwm-todo` PR #3, item 3 in `jmccarrell/jwm-todo` PR #4.
+
 1. **`literate-emacs.d`: steve-purcell's states and the dashboard.**
    - His `org-todo-keywords`, `org-todo-keyword-faces`,
      `org-todo-repeat-to-state` and `org-stuck-projects`, copied.
