@@ -77,11 +77,6 @@ Emacs, or finance. Its top-level headings are its Projects plus one Misc
 heading.
 _Avoid_: Work stream, context
 
-**Project File**:
-An agenda file that holds a single Project as its one top-level heading, with
-no Misc heading.
-_Avoid_: Area, project list
-
 **Project**:
 An outcome that takes more than one Next Action, written as a top-level
 heading in an Area and marked as a project. Open while it has no done state;
