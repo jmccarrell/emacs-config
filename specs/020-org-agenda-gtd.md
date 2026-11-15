@@ -54,41 +54,51 @@ out unless a decision above needs them.
 
 ### Decided
 
-- **Projects** carry a `project` tag that children don't inherit (listed in
-  `org-tags-exclude-from-inheritance`), as in sacha-chua.
-- **`DEFERRED` becomes a live state.** It moves left of the `|`, so deferred
-  items stay open and can have their own block in the weekly review.
-- **Priority**: `A` to `C` with `B` as the default. The dashboard opens with
-  protesilaos's block of `[#A]` tasks that have no scheduled date or deadline;
-  the rest of the agenda keeps the default urgency sort.
-- **Built-in Org only** for the first slice; `org-super-agenda` and `org-ql`
-  wait until a built-in view falls short.
+- **States are steve-purcell's, adopted whole** (`lisp/init-org.el`), mapped
+  from mine:
 
-- **No context tags.** The file is the work stream, and the agenda groups and
-  filters by it. The tags already on headings in `someday.org` (`emacs`,
-  `read_review`, `@train`, `org`, and others) are removed, so `project` is the
-  only tag in the agenda files.
-- **Projects**: an open project heading has no TODO keyword; a finished one
-  gets `DONE` or `CANCELLED`. A project with a `NEXT`, `DOING` or `WAITING`
-  item beneath it is not stuck.
-- **Inbox and Misc**: capture `t` writes to `* Inbox` in `todo.org`, emptied
-  at each weekly review. Each area file has a `* Misc` heading for sorted
-  tasks that belong to no project. Every area gets its own file, so `todo.org`
-  holds only Inbox and Misc.
+  | Mine | steve-purcell's |
+  |---|---|
+  | `TODO`, `NEXT`, `WAITING`, `DONE`, `CANCELLED` | the same |
+  | `DOING` on a task | `NEXT` |
+  | `DOING` on a project heading | `PROJECT` |
+  | `DEFERRED` | `HOLD` |
+  | (none) | `DELEGATED` |
+
+  His sequences: `TODO NEXT | DONE`; `PROJECT | DONE CANCELLED`;
+  `WAITING DELEGATED HOLD | CANCELLED`. A repeating task returns to `NEXT`.
+- **Projects** are headings with the `PROJECT` keyword. A project is stuck
+  until one step beneath it is `NEXT`; that is his `org-stuck-projects`,
+  unchanged. A heading with no keyword appears in no agenda list.
+- **Inbox** is its own file, `inbox.org`, with `#+FILETAGS: INBOX`. Capture `t`
+  writes a `NEXT` item there, as in steve-purcell's config. I empty it at each
+  weekly review.
+- **Areas**: one agenda file per area; its top-level headings are projects plus
+  one `* Misc` heading for tasks that belong to no project. The split of
+  `todo.org` is on the wayfinder map (#76): `lab`, `emacs`, `invest`,
+  `garage` and `coding`, with `todo.org` keeping a Misc for everything else.
+- **No tags** in the agenda files except `INBOX` on `inbox.org`. No context
+  tags; the file is the area, and the agenda groups and filters by it. The tags
+  on headings in `someday.org` go with its contents.
+- **Dashboard** `C-c a g`: steve-purcell's `g` block agenda, unchanged, with
+  protesilaos's block of `[#A]` tasks that have no scheduled date or deadline
+  added first, and `someday.org` left out of the whole command.
+- **Priority**: `A` to `C` with `B` as the default; the rest of the agenda keeps
+  the default urgency sort.
 - **someday.org** stays as the Someday/Maybe list for things I haven't
   committed to, but starts this work empty: its contents move to
-  `someday.org_archive`, old tags with them. It stays in the agenda files so
-  refile reaches it, and is left out of the daily views. `DEFERRED` is for
-  paused items I still mean to do, which stay in their area file.
-- **Defaults**: the dashboard is `C-c a g`; refile takes steve-purcell's
-  settings with `:maxlevel 3`. My "Personal Weekly Review" tickler entry stays
-  as the reminder, and the weekly-review command is what I run when it fires.
+  `someday.org_archive`. It stays in the agenda files so refile reaches it.
+  `HOLD` is for paused items I still mean to do, which stay in their area.
+- **Built-in Org only**; `org-super-agenda` and `org-ql` wait until a built-in
+  view falls short.
+- **Refile** takes steve-purcell's settings with `:maxlevel 3`. My "Personal
+  Weekly Review" tickler entry stays as the reminder, and the weekly-review
+  command is what I run when it fires.
 - Archive files keep their tags; nothing in this work touches them.
 
 ### Open
 
 Worked on the wayfinder map for spec 020.
 
-- Which area files `todo.org` splits into.
-- What the GTD dashboard and the weekly review show.
+- What the weekly review shows.
 - The build order.
