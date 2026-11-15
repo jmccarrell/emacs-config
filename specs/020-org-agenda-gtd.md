@@ -97,8 +97,29 @@ out unless a decision above needs them.
 - **Refile** takes steve-purcell's settings with `:maxlevel 3`.
 - Archive files keep their tags; nothing in this work touches them.
 
-### Open
+### Build order
 
-Worked on the wayfinder map for spec 020.
+Decided on the wayfinder map #75; the area split is in #76 and its
+amendments. Three pull requests, in this order:
 
-- The build order.
+1. **`literate-emacs.d`: steve-purcell's states and the dashboard.**
+   - His `org-todo-keywords`, `org-todo-keyword-faces`,
+     `org-todo-repeat-to-state` and `org-stuck-projects`, copied.
+   - Capture `t` writes `* NEXT` to `inbox.org` in `org-directory`.
+   - His refile settings, with `:maxlevel 3`.
+   - `C-c a g`: his `g` block agenda with protesilaos's undated `[#A]` block
+     first and `someday.org` left out of the command.
+   - The cheat sheet's Org section gets the states and the dashboard keys.
+2. **`jwm-todo`: the files take his states.** Merged right after 1, since
+   each one alone leaves states Org doesn't recognize.
+   - `DOING` becomes `NEXT` on tasks; `DOING` on a project heading, and every
+     heading under `* Projects`, becomes `PROJECT`; `DEFERRED` becomes `HOLD`.
+   - New `inbox.org` with `#+FILETAGS: INBOX`, first in
+     `org-agenda-files-list`.
+   - someday.org's contents move to `someday.org_archive`; the file stays.
+3. **`jwm-todo`: the area split.** Independent of 1 and 2 once they land.
+   - Done items archived; "todo weekend Nov 7" broken into tasks.
+   - New `invest.org`, `garage.org` and `coding.org`; project headings
+     promoted to top level in each area, with `* Misc` for the rest.
+   - `todo.org` keeps Misc only; `jeff-ci.org` and `tome.org` leave
+     `org-agenda-files-list`, and `tome.org` is deleted.
