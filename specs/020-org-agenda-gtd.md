@@ -4,7 +4,7 @@ I manage projects in Org with my own states (`TODO NEXT DOING WAITING | DONE
 CANCELLED DEFERRED`), capture templates and refile, but I have no custom agenda
 commands. I like a Getting Things Done flow, and I want the agenda to show me
 what to do next, which projects are stuck, and what matters most by priority.
-`research/org-agenda-gtd.md` (#73) found real GTD agenda setups in
+`research/org-agenda-gtd.md` (#79) found real GTD agenda setups in
 steve-purcell, jwiegley, sacha-chua and my own greendog-gtd snapshot, and a
 priority view in protesilaos. I want to choose among those patterns rather
 than invent new configuration.
