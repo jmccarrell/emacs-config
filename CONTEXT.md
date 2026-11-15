@@ -70,3 +70,38 @@ _Avoid_: Complete IDE, debugger workflow
 The Rust Development Workflow built first from Emacs 30 capabilities, with
 additional packages adopted only to fill a demonstrated gap.
 _Avoid_: Full Rust IDE distribution, package bundle
+
+**Area**:
+One agenda file that holds one part of Jeff's life or work, such as the lab,
+Emacs, or investing. Its top-level headings are its Projects plus one Misc
+heading.
+_Avoid_: Work stream, context
+
+**Project**:
+An outcome that takes more than one Next Action, written as a heading with the
+PROJECT state in an Area. Stuck until one step beneath it is a Next Action.
+_Avoid_: Task list, Projects section
+
+**Next Action**:
+The next concrete step on a Project or in Misc, ready to be done; the NEXT
+state.
+_Avoid_: Todo, doing
+
+**Inbox**:
+The single file captured items land in before they are sorted into an Area.
+Emptied at each weekly review.
+_Avoid_: Tasks section, notes file
+
+**Misc**:
+The heading in each Area for sorted tasks that belong to no Project.
+_Avoid_: Inbox, Tasks section
+
+**On Hold**:
+A paused item that stays open in its Area because Jeff still means to do it;
+the HOLD state.
+_Avoid_: Deferred, Someday, cancelled
+
+**Someday**:
+The list of things Jeff has not committed to, kept in its own file outside
+any Area and left out of the daily views.
+_Avoid_: On Hold, backlog
